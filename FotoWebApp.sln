@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.11.35222.181
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FotoWebApp", "FotoWebApp\FotoWebApp\FotoWebApp.csproj", "{AE6F1953-7702-4527-9AEF-5BEB27FA6A5C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FotoWebApp.Client", "FotoWebApp\FotoWebApp.Client\FotoWebApp.Client.csproj", "{C745536B-C66E-4A48-B8C2-417512385644}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{AE6F1953-7702-4527-9AEF-5BEB27FA6A5C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AE6F1953-7702-4527-9AEF-5BEB27FA6A5C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AE6F1953-7702-4527-9AEF-5BEB27FA6A5C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AE6F1953-7702-4527-9AEF-5BEB27FA6A5C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C745536B-C66E-4A48-B8C2-417512385644}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C745536B-C66E-4A48-B8C2-417512385644}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C745536B-C66E-4A48-B8C2-417512385644}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C745536B-C66E-4A48-B8C2-417512385644}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {B06C0188-4012-4FCF-8AFB-2ABD7EF3828F}
+	EndGlobalSection
+EndGlobal
