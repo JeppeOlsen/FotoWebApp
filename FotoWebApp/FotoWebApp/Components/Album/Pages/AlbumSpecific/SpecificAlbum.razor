@@ -1,0 +1,43 @@
+﻿@page "/SpecificAlbum"
+@using Microsoft.EntityFrameworkCore
+@using FotoWebApp.Models
+@using FotoWebApp.Data
+@inject ApplicationDbContext MyDbContext
+
+<PageTitle>Index</PageTitle>
+
+<h3>SpecificAlbum</h3>
+
+<MudGrid>
+    @* Customer Info Area *@
+    <MudItem xs="12" sm="4">
+        <MudPaper Class="d-flex align-center justify-center mud-width-full py-8">xs=12 sm=4</MudPaper>
+    </MudItem>
+    @* Upload Area *@
+    <MudItem xs="12" sm="8">
+        <MudPaper Class="d-flex align-center justify-center mud-width-full py-8">xs=12 sm=8</MudPaper>
+    </MudItem>
+
+    @* Photos Area *@
+    <MudItem xs="12">
+        <MudGrid Justify="Justify.FlexStart">
+            @for (int i = 0; i < _papers; i++)
+            {
+            <MudItem xs="12" sm="4">
+                <MudPaper>
+                        <MudImage src="https://avatars.githubusercontent.com/u/132547402?v=4" />
+                </MudPaper>
+            </MudItem>
+            }
+        </MudGrid>
+    </MudItem>
+</MudGrid>
+
+
+<MudPopoverProvider />
+<MudDialogProvider />
+<MudSnackbarProvider />
+
+@code {
+    int _papers = 7;
+}
