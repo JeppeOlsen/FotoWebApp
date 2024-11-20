@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FotoWebApp", "FotoWebApp\Fo
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FotoWebApp.Client", "FotoWebApp\FotoWebApp.Client\FotoWebApp.Client.csproj", "{C745536B-C66E-4A48-B8C2-417512385644}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FotoWebApp.Models", "FotoWebApp.Models\FotoWebApp.Models.csproj", "{00993C40-024B-4E00-8CA2-7D694E0658F9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FotoWebApp.Models", "FotoWebApp.Models\FotoWebApp.Models.csproj", "{00993C40-024B-4E00-8CA2-7D694E0658F9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
