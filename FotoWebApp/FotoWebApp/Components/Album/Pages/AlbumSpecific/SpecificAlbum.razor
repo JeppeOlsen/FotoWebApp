@@ -4,29 +4,68 @@
 @using FotoWebApp.Data
 @inject ApplicationDbContext MyDbContext
 
-<PageTitle>Index</PageTitle>
+<MudPopoverProvider />
+<MudDialogProvider />
+<MudSnackbarProvider />
 
-<h3>SpecificAlbum</h3>
+<PageTitle>Specific Album</PageTitle>
 
 <MudGrid>
-    @* Customer Info Area *@
+    @* Album Info Area *@
     <MudItem xs="12" sm="4">
-        <MudPaper Class="d-flex align-center justify-center mud-width-full py-8">xs=12 sm=4</MudPaper>
-    </MudItem>
-    @* Upload Area *@
-    <MudItem xs="12" sm="8">
-        <MudPaper Class="d-flex align-center justify-center mud-width-full py-8">xs=12 sm=8</MudPaper>
+
+        <EditForm Model="@model" OnValidSubmit="OnValidSubmit">
+            <DataAnnotationsValidator /> @* Helper component to validate based on dataannotations on a model class *@
+            <MudGrid>
+                <MudItem xs="12">
+                    <MudCard>
+                        <MudCardContent>
+                            @* Album Name *@
+                            <MudTextField Label="Album Name" Class="mb-6"
+                                          @bind-Value="model.Name" For="@(() => model.Name)" />
+                            @* Customer Info *@
+                            <MudTextField Label="Customer Name" Class="mb-3"
+                                          @bind-Value="model.Customer.Name" For="@(() => model.Customer.Name)" />
+                            <MudTextField Label="Customer Email" Class="mb-3"
+                                          @bind-Value="model.Customer.Email" For="@(() => model.Customer.Email)" />
+                            <MudTextField Label="Customer Phone" Class="mb-6"
+                                          @bind-Value="model.Customer.Phone" For="@(() => model.Customer.Phone)" />
+                            @* Deadline *@
+                            <MudDatePicker Label="Deadline" 
+                                DateFormat="dd.MM.yyyy" ShowWeekNumbers="true"
+                                Editable="true" Placeholder="Vælg dato"
+                                @bind-Date="model.Deadline" />
+                        </MudCardContent>
+                        <MudCardActions>
+                            <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">Save</MudButton>
+                        </MudCardActions>
+                    </MudCard>
+                </MudItem>
+            </MudGrid>
+        </EditForm>
     </MudItem>
 
-    @* Photos Area *@
+    @* Upload Area *@
+    <MudItem xs="12" sm="8">
+        <MudPaper Class="d-flex align-center justify-center mud-width-full mud-height-full py-8">
+            xs=12 sm=8
+        </MudPaper>
+    </MudItem>
+
+    @* Photos Area *@ @* TODO: Skal laves cool *@
     <MudItem xs="12">
         <MudGrid Justify="Justify.FlexStart">
-            @for (int i = 0; i < _papers; i++)
+            @for (int i = 0; i < ImagesCount; i++)
             {
             <MudItem xs="12" sm="4">
-                <MudPaper>
-                        <MudImage src="https://avatars.githubusercontent.com/u/132547402?v=4" />
-                </MudPaper>
+                @* <MudPaper> *@
+                        <MudImage Fluid="true" 
+                            ObjectFit="ObjectFit.Cover" 
+                            ObjectPosition="ObjectPosition.Center" 
+                            Class="rounded-lg" 
+                            src="https://avatars.githubusercontent.com/u/132547402?v=4" 
+                            />
+                @* </MudPaper> *@
             </MudItem>
             }
         </MudGrid>
@@ -34,10 +73,63 @@
 </MudGrid>
 
 
-<MudPopoverProvider />
-<MudDialogProvider />
-<MudSnackbarProvider />
+
 
 @code {
-    int _papers = 7;
+
+    #region Hardcoded Album Data
+    Album model = new Album
+        {
+            AlbumId = 1,
+            Name = "Wedding Album",
+            // Deadline = DateTime.Now.AddMonths(1),
+            AlbumLink = "http://example.com/album1",
+            PhotographerId = 1,
+            Photographer = new Photographer
+            {
+                PhotographerId = 1,
+                Name = "John Doe",
+                Albums = new List<Album>()
+            },
+            Customer = new Customer
+            {
+                CustomerId = 1,
+                Name = "Jane Doe",
+                Email = "JaneDoe@gmail.com",
+                Phone = "+45 12 34 56 78",
+            },
+            Images = new List<Image>()
+        };
+    #endregion
+
+    [Parameter]
+    public int SuppliedAlbumId { get; set; }
+
+    protected override void OnInitialized()
+    {
+        // gør dit og dat
+        // model = MyDbContext.Albums.First(Album => Album.AlbumId == SuppliedAlbumId);
+    }
+
+    #region Album Info
+    bool success;
+
+    private void OnValidSubmit(EditContext context)
+    {
+        success = true;
+        StateHasChanged(); // Refresh the UI
+    }
+    #endregion
+
+    
+
+    #region File Upload Area
+    
+    #endregion
+
+    #region Photos Area
+    int ImagesCount = 9;
+    #endregion
+
+    
 }

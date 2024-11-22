@@ -16,7 +16,7 @@ namespace FotoWebApp.Models
         public int AlbumId { get; set; }
 
         public string Name { get; set; }
-        public DateTime Deadline { get; set; }
+        public DateTime? Deadline { get; set; }
         public string AlbumLink { get; set; }
 
 
