@@ -3,8 +3,10 @@
 @using FotoWebApp.Models
 @using FotoWebApp.Data
 @rendermode InteractiveServer
-@inject IDbContextFactory<FotoWebApp.Data.ApplicationDbContext> DbFactory // Inject the IDbContextFactory to create a new instance of the DbContext when needed (Scoped). This is recommended because the DbContext is not thread-safe.
-@inject NavigationManager NavigationManager // Inject the NavigationManager to navigate between pages 
+@inject ApplicationDbContext dbContext // Inject the DbContext to interact with the database
+@inject NavigationManager NavigationManager // Inject the NavigationManager to navigate between pages
+@* @inject IDbContextFactory<FotoWebApp.Data.ApplicationDbContext> DbFactory // Inject the IDbContextFactory to create a new instance of the DbContext when needed (Scoped). This is recommended because the DbContext is not thread-safe.
+@inject NavigationManager NavigationManager // Inject the NavigationManager to navigate between pages  *@
 
 <MudPopoverProvider />
 <MudDialogProvider />
@@ -12,6 +14,12 @@
 
 <PageTitle>Specific Album</PageTitle>
 
+@if (Album == null) // If the Album is null
+{
+    <p><em>Loading...</em></p> // Display a loading message
+}
+else
+{
 <MudGrid>
 
     @* Sticky Toolbar? *@
@@ -26,19 +34,19 @@
                         <MudCardContent>
                             @* Album Name *@
                             <MudTextField Label="Album Name" Class="mb-6"
-                                          @bind-Value="model.Name" For="@(() => model.Name)" />
+                                          @bind-Value="Album.Name" For="@(() => Album.Name)" />
                             @* Customer Info *@
                             <MudTextField Label="Customer Name" Class="mb-3"
-                                          @bind-Value="model.Customer.Name" For="@(() => model.Customer.Name)" />
+                                          @bind-Value="Album.Customer.Name" For="@(() => Album.Customer.Name)" />
                             <MudTextField Label="Customer Email" Class="mb-3"
-                                          @bind-Value="model.Customer.Email" For="@(() => model.Customer.Email)" />
+                                          @bind-Value="Album.Customer.Email" For="@(() => Album.Customer.Email)" />
                             <MudTextField Label="Customer Phone" Class="mb-6"
-                                          @bind-Value="model.Customer.Phone" For="@(() => model.Customer.Phone)" />
+                                          @bind-Value="Album.Customer.Phone" For="@(() => Album.Customer.Phone)" />
                             @* Deadline *@
                             <MudDatePicker Label="Deadline" 
                                 DateFormat="dd.MM.yyyy" ShowWeekNumbers="true"
                                 Editable="true" Placeholder="Vælg dato"
-                                @bind-Date="model.Deadline" />
+                                @bind-Date="Album.Deadline" />
                         </MudCardContent>
                         <MudCardActions>
                             <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">Save</MudButton>
@@ -76,8 +84,7 @@
     </MudItem>
 </MudGrid>
 
-
-
+}
 
 @code {
 
@@ -116,7 +123,7 @@
     protected override async Task OnInitializedAsync()
     {
         // Create a new instance of the DbContext
-        using var dbContext = DbFactory.CreateDbContext(); 
+        // using var dbContext = DbFactory.CreateDbContext(); 
 
         // Get the Album from the database based on the AlbumId or null if it does not exist
         Album ??= await dbContext.Albums
@@ -138,16 +145,16 @@
     {
         editContext.Validate(); // Validate the form
 
-        using var dbContext = DbFactory.CreateDbContext();
+        // using var dbContext = DbFactory.CreateDbContext();
         dbContext.Attach(Album!).State = EntityState.Modified; // Attach the Album to the DbContext and set the state to modified
 
         try
         {
-            await dbContext.SaveChangesAsync();
+            await dbContext.SaveChangesAsync(); // Save the changes to the database
         }
         catch (DbUpdateConcurrencyException)
         {
-            if (!AlbumExists(Album!.AlbumId))
+            if (!AlbumExists(Album!.AlbumId)) // Check if the Album exists
             {
                 NavigationManager.NavigateTo("error"); // Navigate to the error page if the Album does not exist"
             } 
@@ -155,8 +162,6 @@
             {
                 throw;
             }
-
-            throw;
         }
 
         StateHasChanged(); // Refresh the UI
@@ -164,7 +169,7 @@
 
     private bool AlbumExists(int albumId)
     {
-        using var dbContext = DbFactory.CreateDbContext();
+        // using var dbContext = DbFactory.CreateDbContext();
         return dbContext.Albums.Any(e => e.AlbumId == albumId); // Check if an Album with the given AlbumId exists
     }
     #endregion
@@ -177,7 +182,5 @@
 
     #region Photos Area
     int ImagesCount = 10;
-    #endregion
-
-    
+    #endregion   
 }
