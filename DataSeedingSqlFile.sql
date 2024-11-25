@@ -27,25 +27,3 @@ FROM Customers;
 
 -- Insert statements
 
-Begin transaction;
-
-SET IDENTITY_INSERT Photographers ON;
-INSERT INTO Photographers (Column1, Column2, Column3) VALUES ('1', 'Ben');
-INSERT INTO Photographers (Column1, Column2, Column3) VALUES ('2', 'Hans');
-INSERT INTO Photographers (Column1, Column2, Column3) VALUES ('3', 'Kalle');
-INSERT INTO Photographers (Column1, Column2, Column3) VALUES ('4', 'Henning');
-SET IDENTITY_INSERT Photographers OFF;
-
-SET IDENTITY_INSERT Albums ON;
-INSERT INTO Albums (Column1, Column2, Column3) VALUES ('11', 'Solsikken', '2025-05-16 05:50:06.0000000', 'www.juhuuu.com', '1');
-INSERT INTO Albums (Column1, Column2, Column3) VALUES ('12', 'Bavian', '2027-12-02 14:00:00.0000000', 'www.bavian.com', '4');
-INSERT INTO Albums (Column1, Column2, Column3) VALUES ('17', 'Nike', '2025-05-16 13:00:00.0000000', 'www.Nike.com', '1');
-SET IDENTITY_INSERT Albums OFF;
-
-SET IDENTITY_INSERT Customers ON;
-INSERT INTO Customers (Column1, Column2, Column3) VALUES ('1', 'Nike', 'nike@gmail.com', '12121212', '17');
-INSERT INTO Customers (Column1, Column2, Column3) VALUES ('2', 'Janne', 'janne@gmail.com', '28367374', '11');
-INSERT INTO Customers (Column1, Column2, Column3) VALUES ('3', 'Tøjbutikken', 'Tøj@gmail.com', '65653355', '12');
-SET IDENTITY_INSERT Customers OFF;
-
-Commit transaction;
