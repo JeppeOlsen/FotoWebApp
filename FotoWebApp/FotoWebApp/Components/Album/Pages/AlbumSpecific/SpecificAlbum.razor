@@ -3,7 +3,8 @@
 @using FotoWebApp.Models
 @using FotoWebApp.Data
 @rendermode InteractiveServer
-@inject ApplicationDbContext MyDbContext
+@inject IDbContextFactory<FotoWebApp.Data.ApplicationDbContext> DbFactory // Inject the IDbContextFactory to create a new instance of the DbContext when needed (Scoped). This is recommended because the DbContext is not thread-safe.
+@inject NavigationManager NavigationManager // Inject the NavigationManager to navigate between pages 
 
 <MudPopoverProvider />
 <MudDialogProvider />
@@ -12,10 +13,12 @@
 <PageTitle>Specific Album</PageTitle>
 
 <MudGrid>
+
+    @* Sticky Toolbar? *@
+
     @* Album Info Area *@
     <MudItem xs="12" sm="4">
-
-        <EditForm Model="@model" OnValidSubmit="OnValidSubmit">
+        <EditForm Model="@model" OnValidSubmit="UpdateAlbum">
             <DataAnnotationsValidator /> @* Helper component to validate based on dataannotations on a model class *@
             <MudGrid>
                 <MudItem xs="12">
@@ -58,15 +61,15 @@
         <MudGrid Justify="Justify.FlexStart">
             @for (int i = 0; i < ImagesCount; i++)
             {
-            <MudItem xs="12" sm="4">
-                @* <MudPaper> *@
+            <MudItem xs="12" sm="12" md="6" lg="6" xl="4" xxl="2" >
+                <MudPaper>
                         <MudImage Fluid="true" 
                             ObjectFit="ObjectFit.Cover" 
                             ObjectPosition="ObjectPosition.Center" 
                             Class="rounded-lg" 
                             src="https://avatars.githubusercontent.com/u/132547402?v=4" 
                             />
-                @* </MudPaper> *@
+                </MudPaper>
             </MudItem>
             }
         </MudGrid>
@@ -103,22 +106,66 @@
         };
     #endregion
 
-    [Parameter]
-    public int SuppliedAlbumId { get; set; }
+    [SupplyParameterFromQuery] // Supply the AlbumId from the query string
+    public int AlbumId { get; set; }
 
-    protected override void OnInitialized()
+    [SupplyParameterFromForm] // Supply the Album from the form
+    public Album? Album { get; set; }
+
+    // This method is called when the component is initialized
+    protected override async Task OnInitializedAsync()
     {
-        // gør dit og dat
-        // model = MyDbContext.Albums.First(Album => Album.AlbumId == SuppliedAlbumId);
+        // Create a new instance of the DbContext
+        using var dbContext = DbFactory.CreateDbContext(); 
+
+        // Get the Album from the database based on the AlbumId or null if it does not exist
+        Album ??= await dbContext.Albums
+            .Include(Album => Album.Customer) // Include the Customer navigation property
+            .Include(Album => Album.Photographer) // Include the Photographer navigation property
+            .Include(Album => Album.Images) // Include the Images navigation property (should probably be lazily loaded later on)
+            .FirstOrDefaultAsync(Album => Album.AlbumId == AlbumId); 
+
+        // If the Album does not exist, navigate to the notfound page
+        if (Album is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
     }
 
     #region Album Info
-    bool success;
 
-    private void OnValidSubmit(EditContext context)
+    private async Task UpdateAlbum(EditContext editContext)
     {
-        success = true;
+        editContext.Validate(); // Validate the form
+
+        using var dbContext = DbFactory.CreateDbContext();
+        dbContext.Attach(Album!).State = EntityState.Modified; // Attach the Album to the DbContext and set the state to modified
+
+        try
+        {
+            await dbContext.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!AlbumExists(Album!.AlbumId))
+            {
+                NavigationManager.NavigateTo("error"); // Navigate to the error page if the Album does not exist"
+            } 
+            else
+            {
+                throw;
+            }
+
+            throw;
+        }
+
         StateHasChanged(); // Refresh the UI
+    }
+
+    private bool AlbumExists(int albumId)
+    {
+        using var dbContext = DbFactory.CreateDbContext();
+        return dbContext.Albums.Any(e => e.AlbumId == albumId); // Check if an Album with the given AlbumId exists
     }
     #endregion
 
@@ -129,7 +176,7 @@
     #endregion
 
     #region Photos Area
-    int ImagesCount = 9;
+    int ImagesCount = 10;
     #endregion
 
     
