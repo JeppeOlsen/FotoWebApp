@@ -1,28 +1,28 @@
 ﻿-- En måde vi kan generere Insert statements til vores tabeller. 
 -- Bruges kun til at generere nye insert statements, slet hvis du ikke skal bruge dem.
---SELECT 
---    'INSERT INTO Photographers (PhotographerId, Name) VALUES (' +
---    QUOTENAME(PhotographerId, '''') + ', ' +
---    QUOTENAME(Name, '''') + ');'
---FROM Photographers;
+SELECT 
+    'INSERT INTO Photographers (PhotographerId, Name) VALUES (' +
+    QUOTENAME(PhotographerId, '''') + ', ' +
+    QUOTENAME(Name, '''') + ');'
+FROM Photographers;
 
---SELECT 
---    'INSERT INTO Albums (AlbumId, Name, Deadline, AlbumLink, PhotographerId) VALUES (' +
---    QUOTENAME(AlbumId, '''') + ', ' +
---    QUOTENAME(Name, '''') + ', ' +
---    QUOTENAME(Deadline, '''') + ', ' +
---    QUOTENAME(AlbumLink, '''') + ', ' +
---    QUOTENAME(PhotographerId, '''') + ');'
---FROM Albums;
+SELECT 
+    'INSERT INTO Albums (AlbumId, Name, Deadline, AlbumLink, PhotographerId) VALUES (' +
+    QUOTENAME(AlbumId, '''') + ', ' +
+    QUOTENAME(Name, '''') + ', ' +
+    QUOTENAME(Deadline, '''') + ', ' +
+    QUOTENAME(AlbumLink, '''') + ', ' +
+    QUOTENAME(PhotographerId, '''') + ');'
+FROM Albums;
 
---SELECT 
---    'INSERT INTO Customers (CustomerId, Name, Email, Phone, AlbumId) VALUES (' +
---    QUOTENAME(CustomerId, '''') + ', ' +
---    QUOTENAME(Name, '''') + ', ' +
---    QUOTENAME(Email, '''') + ', ' +
---    QUOTENAME(Phone, '''') + ', ' +
---    QUOTENAME(AlbumId, '''') + ');'
---FROM Customers;
+SELECT 
+    'INSERT INTO Customers (CustomerId, Name, Email, Phone, AlbumId) VALUES (' +
+    QUOTENAME(CustomerId, '''') + ', ' +
+    QUOTENAME(Name, '''') + ', ' +
+    QUOTENAME(Email, '''') + ', ' +
+    QUOTENAME(Phone, '''') + ', ' +
+    QUOTENAME(AlbumId, '''') + ');'
+FROM Customers;
 
 
 --Insert statements
