@@ -2,42 +2,153 @@
 @using Microsoft.EntityFrameworkCore
 @using FotoWebApp.Models
 @using FotoWebApp.Data
-@inject ApplicationDbContext MyDbContext
+@rendermode InteractiveServer
+@inject ApplicationDbContext dbContext // Inject the DbContext to interact with the database
+@inject NavigationManager NavigationManager // Inject the NavigationManager to navigate between pages
+@* @inject IDbContextFactory<FotoWebApp.Data.ApplicationDbContext> DbFactory // Inject the IDbContextFactory to create a new instance of the DbContext when needed (Scoped). This is recommended because the DbContext is not thread-safe.
+@inject NavigationManager NavigationManager // Inject the NavigationManager to navigate between pages  *@
 
-<PageTitle>Index</PageTitle>
+<MudPopoverProvider />
+<MudDialogProvider />
+<MudSnackbarProvider />
 
-<h3>SpecificAlbum</h3>
+<PageTitle>Specific Album</PageTitle>
 
+@if (Album == null) // If the Album is null
+{
+    <p><em>Loading...</em></p> // Display a loading message
+}
+else
+{
 <MudGrid>
-    @* Customer Info Area *@
+
+    @* Sticky Toolbar? *@
+
+    @* Album Info Area *@
     <MudItem xs="12" sm="4">
-        <MudPaper Class="d-flex align-center justify-center mud-width-full py-8">xs=12 sm=4</MudPaper>
+        <EditForm Model="@Album" OnValidSubmit="UpdateAlbum">
+            <DataAnnotationsValidator /> @* Helper component to validate based on dataannotations on a model class *@
+            <MudGrid>
+                <MudItem xs="12">
+                    <MudCard>
+                        <MudCardContent>
+                            @* Album Name *@
+                            <MudTextField Label="Album Name" Class="mb-6"
+                                          @bind-Value="Album.Name" For="@(() => Album.Name)" />
+                            @* Customer Info *@
+                            <MudTextField Label="Customer Name" Class="mb-3"
+                                          @bind-Value="Album.Customer.Name" For="@(() => Album.Customer.Name)" />
+                            <MudTextField Label="Customer Email" Class="mb-3"
+                                          @bind-Value="Album.Customer.Email" For="@(() => Album.Customer.Email)" />
+                            <MudTextField Label="Customer Phone" Class="mb-6"
+                                          @bind-Value="Album.Customer.Phone" For="@(() => Album.Customer.Phone)" />
+                            @* Deadline *@
+                            <MudDatePicker Label="Deadline" 
+                                DateFormat="dd.MM.yyyy" ShowWeekNumbers="true"
+                                Editable="true" Placeholder="Vælg dato"
+                                @bind-Date="Album.Deadline" />
+                        </MudCardContent>
+                        <MudCardActions>
+                            <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">Save</MudButton>
+                        </MudCardActions>
+                    </MudCard>
+                </MudItem>
+            </MudGrid>
+        </EditForm>
     </MudItem>
+
     @* Upload Area *@
     <MudItem xs="12" sm="8">
-        <MudPaper Class="d-flex align-center justify-center mud-width-full py-8">xs=12 sm=8</MudPaper>
+        <MudPaper Class="d-flex align-center justify-center mud-width-full mud-height-full py-8">
+            xs=12 sm=8
+        </MudPaper>
     </MudItem>
 
-    @* Photos Area *@
+    @* Photos Area *@ @* TODO: Skal laves cool *@
     <MudItem xs="12">
         <MudGrid Justify="Justify.FlexStart">
-            @for (int i = 0; i < _papers; i++)
+            @for (int i = 0; i < ImagesCount; i++)
             {
-            <MudItem xs="12" sm="4">
+            <MudItem xs="12" sm="12" md="6" lg="6" xl="4" xxl="2" >
                 <MudPaper>
-                        <MudImage src="https://avatars.githubusercontent.com/u/132547402?v=4" />
+                        <MudImage Fluid="true" 
+                            ObjectFit="ObjectFit.Cover" 
+                            ObjectPosition="ObjectPosition.Center"
+                            Class="rounded-lg" 
+                            src="https://avatars.githubusercontent.com/u/132547402?v=4" 
+                            />
                 </MudPaper>
             </MudItem>
             }
         </MudGrid>
     </MudItem>
 </MudGrid>
-
-
-<MudPopoverProvider />
-<MudDialogProvider />
-<MudSnackbarProvider />
+}
 
 @code {
-    int _papers = 7;
+
+    [SupplyParameterFromQuery] // Supply the AlbumId from the query string
+    public int AlbumId { get; set; }
+
+    [SupplyParameterFromForm] // Supply the Album from the form
+    public Album? Album { get; set; }
+
+    // This method is called when the component is initialized
+    protected override async Task OnInitializedAsync()
+    {
+        // Create a new instance of the DbContext
+        // using var dbContext = DbFactory.CreateDbContext(); 
+
+        // Get the Album from the database based on the AlbumId or null if it does not exist
+        Album ??= await dbContext.Albums
+            .Include(Album => Album.Customer) // Include the Customer navigation property
+            .Include(Album => Album.Photographer) // Include the Photographer navigation property
+            .Include(Album => Album.Images) // Include the Images navigation property (should probably be lazily loaded later on)
+            .FirstOrDefaultAsync(Album => Album.AlbumId == AlbumId); 
+
+        // If the Album does not exist, navigate to the notfound page
+        if (Album is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+
+    #region Album Info
+
+    private async Task UpdateAlbum(EditContext editContext)
+    {
+        editContext.Validate(); // Validate the form
+
+        // using var dbContext = DbFactory.CreateDbContext();
+        dbContext.Attach(Album!).State = EntityState.Modified; // Attach the Album to the DbContext and set the state to modified
+
+        try
+        {
+            await dbContext.SaveChangesAsync(); // Save the changes to the database
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!AlbumExists(Album!.AlbumId)) // Check if the Album exists
+            {
+                NavigationManager.NavigateTo("error"); // Navigate to the error page if the Album does not exist"
+            } 
+            else
+            {
+                throw;
+            }
+        }
+
+        StateHasChanged(); // Refresh the UI
+    }
+
+    private bool AlbumExists(int albumId)
+    {
+        // using var dbContext = DbFactory.CreateDbContext();
+        return dbContext.Albums.Any(e => e.AlbumId == albumId); // Check if an Album with the given AlbumId exists
+    }
+    #endregion
+
+    #region Photos Area
+    int ImagesCount = 10;
+    #endregion   
 }

@@ -15,8 +15,10 @@ namespace FotoWebApp.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int AlbumId { get; set; }
 
+        [Required]
+        [StringLength(50, MinimumLength = 1, ErrorMessage = "Name must be between 1 and 50 characters")]
         public string Name { get; set; }
-        public DateTime Deadline { get; set; }
+        public DateTime? Deadline { get; set; }
         public string AlbumLink { get; set; }
 
 
