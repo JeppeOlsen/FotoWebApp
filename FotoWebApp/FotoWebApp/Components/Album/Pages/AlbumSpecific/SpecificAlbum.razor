@@ -26,7 +26,7 @@ else
 
     @* Album Info Area *@
     <MudItem xs="12" sm="4">
-        <EditForm Model="@model" OnValidSubmit="UpdateAlbum">
+        <EditForm Model="@Album" OnValidSubmit="UpdateAlbum">
             <DataAnnotationsValidator /> @* Helper component to validate based on dataannotations on a model class *@
             <MudGrid>
                 <MudItem xs="12">
@@ -73,7 +73,7 @@ else
                 <MudPaper>
                         <MudImage Fluid="true" 
                             ObjectFit="ObjectFit.Cover" 
-                            ObjectPosition="ObjectPosition.Center" 
+                            ObjectPosition="ObjectPosition.Center"
                             Class="rounded-lg" 
                             src="https://avatars.githubusercontent.com/u/132547402?v=4" 
                             />
@@ -83,35 +83,9 @@ else
         </MudGrid>
     </MudItem>
 </MudGrid>
-
 }
 
 @code {
-
-    #region Hardcoded Album Data
-    Album model = new Album
-        {
-            AlbumId = 1,
-            Name = "Wedding Album",
-            // Deadline = DateTime.Now.AddMonths(1),
-            AlbumLink = "http://example.com/album1",
-            PhotographerId = 1,
-            Photographer = new Photographer
-            {
-                PhotographerId = 1,
-                Name = "John Doe",
-                Albums = new List<Album>()
-            },
-            Customer = new Customer
-            {
-                CustomerId = 1,
-                Name = "Jane Doe",
-                Email = "JaneDoe@gmail.com",
-                Phone = "+45 12 34 56 78",
-            },
-            Images = new List<Image>()
-        };
-    #endregion
 
     [SupplyParameterFromQuery] // Supply the AlbumId from the query string
     public int AlbumId { get; set; }
@@ -172,12 +146,6 @@ else
         // using var dbContext = DbFactory.CreateDbContext();
         return dbContext.Albums.Any(e => e.AlbumId == albumId); // Check if an Album with the given AlbumId exists
     }
-    #endregion
-
-    
-
-    #region File Upload Area
-    
     #endregion
 
     #region Photos Area
