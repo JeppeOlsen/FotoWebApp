@@ -1,4 +1,4 @@
-﻿@page "/SpecificAlbum"
+﻿@page "/albums/{AlbumId:int}"
 @using Microsoft.EntityFrameworkCore
 @using FotoWebApp.Models
 @using FotoWebApp.Data
@@ -21,26 +21,17 @@
 }
 else
 {
-
-    @* <MudPaper style="position: fixed; width: 100%; background-color: rgba(39, 39, 47, 1);
-        z-index: 9999; padding: 13px; border-top: 1px solid rgb(23, 23, 28);">
-        <MudButton Variant="Variant.Filled" Color="Color.Error" OnClick="ShowDeleteConfirmation">
-            Delete Project
-        </MudButton>
-    </MudPaper> *@
-
     <MudGrid Class="mt-0 pa-4">
 
     @* Sticky Toolbar? *@
 
-        <MudItem xs="12" Class="pt-0">
-            <MudPaper>
-                <MudToolBar Class="justify-end">
-                    <MudIconButton Icon="@Icons.Material.Filled.Delete" OnClick="ShowDeleteConfirmation" />
-                </MudToolBar>
-            </MudPaper>
-
-        </MudItem>
+    <MudItem xs="12" Class="pt-0">
+        <MudPaper>
+            <MudToolBar Class="justify-end">
+                    <MudIconButton Icon="@Icons.Material.Filled.DeleteForever" OnClick="ShowDeleteConfirmation" Color="Color.Error" />
+            </MudToolBar>
+        </MudPaper>
+    </MudItem>
        
 
     @* Album Info Area *@
@@ -101,7 +92,7 @@ else
 
 @code {
 
-    [SupplyParameterFromQuery] // Supply the AlbumId from the query string
+    [Parameter] // Supply the AlbumId from the query string
     public int AlbumId { get; set; }
 
     [SupplyParameterFromForm] // Supply the Album from the form

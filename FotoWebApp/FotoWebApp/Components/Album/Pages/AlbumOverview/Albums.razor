@@ -41,7 +41,7 @@ else
         @foreach (var album in albums)
         {
             <MudItem Style="min-width: 255px">
-                <MudLink Href="@($"SpecificAlbum/{album.AlbumId}")" Underline="Underline.None">
+                <MudLink Href="@($"albums/{album.AlbumId}")" Underline="Underline.None">
                     <MudCard>
                         <MudCardMedia Image="https://www.hubspot.com/hs-fs/hubfs/jump-link-same-page_1.webp?width=595&height=400&name=jump-link-same-page_1.webp" Height="200" Style="border-radius: 4px" />
                         <MudCardContent>
