@@ -4,11 +4,13 @@
 @using FotoWebApp.Data
 @inject ApplicationDbContext MyDbContext
 @inject IDialogService DialogService
+@inject ISnackbar Snackbar
 @rendermode @(new InteractiveServerRenderMode(prerender: false))
 
-
+@* mudblazor providers for dialogs and snacbars *@
 <MudDialogProvider />
 <MudPopoverProvider />
+<MudSnackbarProvider />
 
 <div style="position: fixed; width: 100%; background-color: rgba(39, 39, 47, 1); z-index: 1200; padding: 13px; border-top: 1px solid rgb(23, 23, 28);">
     <MudButton @onclick="OpenDialogAsync" Variant="Variant.Filled" Color="Color.Tertiary">Opret Projekt</MudButton>
@@ -63,6 +65,7 @@ else
     // Get album data with customer from DB
     protected override async Task OnInitializedAsync()
     {
+        // Only for demo view, can be deletede (Task.Delay)
         await Task.Delay(500);
         await GetAlbums();
     }
@@ -82,6 +85,12 @@ else
 
     }
 
+    private void SuccesSnackbar()
+    {
+        Snackbar.Configuration.PositionClass = Defaults.Classes.Position.BottomEnd;
+        Snackbar.Add("Projekt Oprettet", Severity.Success, config => { config.VisibleStateDuration = 5000; });
+    }
+
     private async Task OpenDialogAsync()
     {
 
@@ -91,11 +100,10 @@ else
 
         var result = await dialog.Result;
 
-        // Capture the result of the modal from AlbumsAddProhectModal and update the state
+        // Capture the result of the modal from AlbumsAddProhectModal and update the state, and show snacbar
         if(!result.Canceled)
         {
-
-            System.Diagnostics.Debug.Print("succes" + " " + result.Data);
+            SuccesSnackbar();
             await GetAlbums();
             StateHasChanged();
         }
