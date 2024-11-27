@@ -1,24 +1,105 @@
 ﻿@page "/Albums"
-<div style="position: fixed; width: 100%; background-color: rgba(39, 39, 47, 1); z-index: 9999; padding: 13px; border-top: 1px solid rgb(23, 23, 28);">
-    <MudButton Variant="Variant.Filled" Color="Color.Tertiary">Opret Projekt</MudButton>
+@using Microsoft.EntityFrameworkCore
+@using FotoWebApp.Models
+@using FotoWebApp.Data
+@inject ApplicationDbContext MyDbContext
+@inject IDialogService DialogService
+@rendermode @(new InteractiveServerRenderMode(prerender: false))
+
+
+<MudDialogProvider />
+<MudPopoverProvider />
+
+<div style="position: fixed; width: 100%; background-color: rgba(39, 39, 47, 1); z-index: 1200; padding: 13px; border-top: 1px solid rgb(23, 23, 28);">
+    <MudButton @onclick="OpenDialogAsync" Variant="Variant.Filled" Color="Color.Tertiary">Opret Projekt</MudButton>
 </div>
 
-<MudGrid Spacing="6" Class="pa-4" style="padding-top: 80px !important;">
-        <MudItem Style="min-width: 255px">
-            <MudCard>
-                <div style="position: relative; padding: 5px">
-                    <MudCardMedia Image="https://www.hubspot.com/hs-fs/hubfs/jump-link-same-page_1.webp?width=595&height=400&name=jump-link-same-page_1.webp" Height="200" Style="border-radius: 4px"/>
-                    <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Error" Size="Size.Small" Style="position: absolute; top: 10px; right: 10px; background-color: rgba(0,0,0, 0.5)" />
-                </div>
-                <MudCardContent>
-                    <MudText Typo="Typo.h5">Solsikken</MudText>
-                    <MudText Typo="Typo.body2">Jhon Doe</MudText>
-                    <MudText Typo="Typo.body2">20/12/2024</MudText>
-                </MudCardContent>
-            </MudCard>
-        </MudItem>
+@if (albums == null)
+{
+    <MudGrid Spacing="6" Class="pa-4" style="padding-top: 80px !important;">
+        @for (int i = 0; i < loadingBoxes; i++)
+        {
+            <MudItem Style="min-width: 255px">
+                <MudCard>
+                    <MudSkeleton SkeletonType="SkeletonType.Rectangle" Height="200px" />
+                    <MudCardContent>
+                        <MudSkeleton Width="30%" Height="42px;" />
+                        <MudSkeleton Width="80%" />
+                        <MudSkeleton Width="100%" />
+                    </MudCardContent>
+                </MudCard>
+            </MudItem>
+        }
     </MudGrid>
 
+}
+else
+{
+    <MudGrid Spacing="6" Class="pa-4" style="padding-top: 80px !important;">
+        @foreach (var album in albums)
+        {
+            <MudItem Style="min-width: 255px">
+                <MudLink Href="@($"SpecificAlbum/{album.AlbumId}")" Underline="Underline.None">
+                    <MudCard>
+                        <MudCardMedia Image="https://www.hubspot.com/hs-fs/hubfs/jump-link-same-page_1.webp?width=595&height=400&name=jump-link-same-page_1.webp" Height="200" Style="border-radius: 4px" />
+                        <MudCardContent>
+                            <MudText Typo="Typo.h5">@album.Name</MudText>
+                            <MudText Typo="Typo.body2">@album.Customer.Name</MudText>
+                            <MudText Typo="Typo.body2">@album.Deadline</MudText>
+                        </MudCardContent>
+                    </MudCard>
+                </MudLink>
+            </MudItem>
+        }
+    </MudGrid>
+}
+
+
 @code {
+    private List<Album>? albums;
+
+    private int loadingBoxes = 30;
+
+    // Get album data with customer from DB
+    protected override async Task OnInitializedAsync()
+    {
+        await Task.Delay(500);
+        await GetAlbums();
+    }
+
+    private async Task GetAlbums()
+    {
+        try
+        {
+            albums = await MyDbContext.Albums
+            .Include(x => x.Customer)
+            .ToListAsync();
+        }
+        catch (Exception ex)
+        {
+            throw;
+        }
+
+    }
+
+    private async Task OpenDialogAsync()
+    {
+
+        var options = new DialogOptions {CloseButton = true, MaxWidth = MaxWidth.Medium, FullWidth = true};
+
+        var dialog = await DialogService.ShowAsync<AlbumsAddProjectModal>("Opret Projekt", options);
+
+        var result = await dialog.Result;
+
+        // Capture the result of the modal from AlbumsAddProhectModal and update the state
+        if(!result.Canceled)
+        {
+
+            System.Diagnostics.Debug.Print("succes" + " " + result.Data);
+            await GetAlbums();
+            StateHasChanged();
+        }
+
+    }
 
 }
