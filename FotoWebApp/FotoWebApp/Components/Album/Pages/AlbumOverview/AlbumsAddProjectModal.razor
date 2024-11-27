@@ -1,0 +1,82 @@
+﻿@using Microsoft.EntityFrameworkCore
+@using FotoWebApp.Models
+@using FotoWebApp.Data
+@inject ApplicationDbContext dbContext
+
+<MudDialog>
+    <DialogContent>
+            <EditForm Model="@newAlbum" OnValidSubmit="CreateAlbum">
+                <DataAnnotationsValidator /> @* Helper component to validate based on dataannotations on a model class *@
+                <MudCard>
+                    <MudCardContent>
+                        <MudTextField Label="Projekt Navn" Class="mb-6"
+                                      @bind-Value="newAlbum.Name" For="@(() => newAlbum.Name)" />
+                        <MudTextField Label="Kunde Navn" Class="mb-3"
+                                      @bind-Value="newCustomer.Name" For="@(() => newCustomer.Name)" />
+                        <MudTextField Label="Kunde Email" Class="mb-3"
+                                      @bind-Value="newCustomer.Email" For="@(() => newCustomer.Email)" />
+                        <MudTextField Label="Kunde Telefon" Class="mb-6"
+                                      @bind-Value="newCustomer.Phone" For="@(() => newCustomer.Phone)" />
+                        <MudDatePicker Label="Deadline"
+                                       DateFormat="dd.MM.yyyy" ShowWeekNumbers="true"
+                                       Editable="true" Placeholder="Vælg dato"
+                                       @bind-Date="newAlbum.Deadline" />
+                    </MudCardContent>
+                    <MudCardActions>
+                    <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Success" Class="ml-auto">Opret nyt projekt</MudButton>
+                    </MudCardActions>
+                </MudCard>
+            </EditForm>
+    </DialogContent>
+    <DialogActions>
+        
+    </DialogActions>
+</MudDialog>
+
+@code {
+    public Album? newAlbum = new Album();
+
+    public Customer? newCustomer = new Customer();
+
+    // Mock id for now. We should get the id from the logged in user / photographer
+    public int photoGrapherId = 1;
+
+    [CascadingParameter]
+    private MudDialogInstance MudDialog { get; set; }
+
+    private void Submit() => MudDialog.Close(DialogResult.Ok(true));
+
+    private async Task CreateAlbum(EditContext editContext)
+    {
+        try
+        {
+            // Validating form
+            editContext.Validate();
+
+            // Set the PhotographerId
+            newAlbum.PhotographerId = photoGrapherId;
+
+            // TODO make unique link for the project and save it to the project/album
+            newAlbum.AlbumLink = "www.link.dk";
+
+            newAlbum.Customer = newCustomer;
+
+            dbContext.Albums.Add(newAlbum);
+            await dbContext.SaveChangesAsync();
+
+            // resets form after succesful submit
+            newAlbum = new Album();
+            newCustomer = new Customer();
+
+            // Close the modal with success. Used in Albums.razor to update the state
+            Submit();
+        }
+        catch(DbUpdateException)
+        {
+            throw;
+        }
+
+
+    }
+}
+
