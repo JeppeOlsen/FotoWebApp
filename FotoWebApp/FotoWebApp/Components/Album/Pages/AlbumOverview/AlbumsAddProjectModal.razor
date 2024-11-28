@@ -17,6 +17,8 @@
                                       @bind-Value="newCustomer.Email" For="@(() => newCustomer.Email)" />
                         <MudTextField Label="Kunde Telefon" Class="mb-6"
                                       @bind-Value="newCustomer.Phone" For="@(() => newCustomer.Phone)" />
+                        <MudNumericField Label="Max Antal Billeder" Class="mb-6" Variant="Variant.Text"
+                                    @bind-Value="newAlbum.MaxSelectedImages" For="@(() => newAlbum.MaxSelectedImages)" />
                         <MudDatePicker Label="Deadline"
                                        DateFormat="dd.MM.yyyy" ShowWeekNumbers="true"
                                        Editable="true" Placeholder="Vælg dato"

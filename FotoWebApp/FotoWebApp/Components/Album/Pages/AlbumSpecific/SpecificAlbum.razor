@@ -17,22 +17,25 @@
 <PageTitle>Specific Album</PageTitle>
 @if (Album == null) // If the Album is null
 {
-    <p><em>Loading...</em></p> // Display a loading message
+    @* <p><em>Loading...</em></p> // Display a loading message *@
+    <MudProgressCircular Color="Color.Primary" Size="Size.Large" Indeterminate="true" />
 }
 else
 {
-    <MudGrid Class="mt-0 pa-4">
-
     @* Sticky Toolbar? *@
-
     <MudItem xs="12" Class="pt-0">
         <MudPaper>
             <MudToolBar Class="justify-end">
+                <p>Selected Images: @SelectedImagesCount / @Album.MaxSelectedImages</p>
+                <MudSpacer />
+                <MudTooltip Text="Delete Project">
                     <MudIconButton Icon="@Icons.Material.Filled.DeleteForever" OnClick="ShowDeleteConfirmation" Color="Color.Error" />
+                </MudTooltip>
             </MudToolBar>
         </MudPaper>
     </MudItem>
-       
+
+    <MudGrid Class="pa-4">
 
     @* Album Info Area *@
     <MudItem xs="12" sm="4">
@@ -52,6 +55,9 @@ else
                                           @bind-Value="Album.Customer.Email" For="@(() => Album.Customer.Email)" />
                             <MudTextField Label="Customer Phone" Class="mb-6"
                                           @bind-Value="Album.Customer.Phone" For="@(() => Album.Customer.Phone)" />
+                            @* Max Selected Images *@
+                            <MudNumericField Label="Max Antal Billeder" Class="mb-6" Variant="Variant.Text"
+                                          @bind-Value="Album.MaxSelectedImages" For="@(() => Album.MaxSelectedImages)" />
                             @* Deadline *@
                             <MudDatePicker Label="Deadline" 
                                 DateFormat="dd.MM.yyyy" ShowWeekNumbers="true"
@@ -91,6 +97,7 @@ else
 }
 
 @code {
+    public int SelectedImagesCount { get; set; } = 0; // TODO: Get from database / count of approved images
 
     [Parameter] // Supply the AlbumId from the query string
     public int AlbumId { get; set; }
@@ -143,7 +150,7 @@ else
             }
         }
 
-        StateHasChanged(); // Refresh the UI
+        // StateHasChanged(); // Refresh the UI
     }
 
     private bool AlbumExists(int albumId)

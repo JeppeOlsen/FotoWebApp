@@ -12,13 +12,16 @@
 <MudPopoverProvider />
 <MudSnackbarProvider />
 
-<div style="position: fixed; width: 100%; background-color: rgba(39, 39, 47, 1); z-index: 1200; padding: 13px; border-top: 1px solid rgb(23, 23, 28);">
+@* <div style="position: fixed; width: 100%; background-color: rgba(39, 39, 47, 1); z-index: 1200; padding: 13px; border-top: 1px solid rgb(23, 23, 28);">
     <MudButton @onclick="OpenDialogAsync" Variant="Variant.Filled" Color="Color.Tertiary">Opret Projekt</MudButton>
-</div>
+</div> *@
 
 @if (albums == null)
 {
+
+    @* Skeleton render *@ 
     <MudGrid Spacing="6" Class="pa-4" style="padding-top: 80px !important;">
+
         @for (int i = 0; i < loadingBoxes; i++)
         {
             <MudItem Style="min-width: 255px">
@@ -37,7 +40,19 @@
 }
 else
 {
-    <MudGrid Spacing="6" Class="pa-4" style="padding-top: 80px !important;">
+    @* Tool Bar *@
+    <MudItem xs="12" Class="pt-0">
+        <MudPaper>
+            <MudToolBar Class="justify-start">
+                <MudTooltip Text="Add Project">
+                    <MudIconButton Icon="@Icons.Material.Filled.CreateNewFolder" @onclick="OpenDialogAsync" Color="Color.Tertiary" />
+                </MudTooltip>
+            </MudToolBar>
+        </MudPaper>
+    </MudItem>
+
+    @* Ablums Grid *@
+    <MudGrid Spacing="6" Class="pa-4">
         @foreach (var album in albums)
         {
             <MudItem Style="min-width: 255px">
@@ -65,8 +80,7 @@ else
     // Get album data with customer from DB
     protected override async Task OnInitializedAsync()
     {
-        // Only for demo view, can be deletede (Task.Delay)
-        await Task.Delay(500);
+        // await Task.Delay(500); // Only for demo view
         await GetAlbums();
     }
 
