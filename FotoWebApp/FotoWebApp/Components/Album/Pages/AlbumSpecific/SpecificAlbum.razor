@@ -26,8 +26,17 @@ else
     <MudItem xs="12" Class="pt-0">
         <MudPaper>
             <MudToolBar Class="justify-end">
-                <p>Selected Images: @SelectedImagesCount / @Album.MaxSelectedImages</p>
+                <MudFileUpload T="IReadOnlyList<IBrowserFile>" FilesChanged="UploadFiles" MaximumFileCount="100" AppendMultipleFiles="true" Accept=".png, .jpg, .gif, .tiff, .tif, .heif, .heic, .bmp">
+                    <ActivatorContent>
+                        <MudButton Variant="Variant.Filled"
+                                   Color="Color.Primary"
+                                   StartIcon="@Icons.Material.Filled.CloudUpload">
+                            Upload Files
+                        </MudButton>
+                    </ActivatorContent>
+                </MudFileUpload>
                 <MudSpacer />
+                <p>Selected Images: @SelectedImagesCount / @Album.MaxSelectedImages</p>
                 <MudTooltip Text="Delete Project">
                     <MudIconButton Icon="@Icons.Material.Filled.DeleteForever" OnClick="ShowDeleteConfirmation" Color="Color.Error" />
                 </MudTooltip>
@@ -208,6 +217,18 @@ else
             dbContext.Albums.Remove(Album);
             await dbContext.SaveChangesAsync();
             NavigationManager.NavigateTo("/albums"); // Redirect after deletion
+        }
+    }
+    #endregion
+
+    #region Upload Images
+    IList<IBrowserFile> _files = new List<IBrowserFile>();
+    private void UploadFiles(IReadOnlyList<IBrowserFile> files)
+    {
+        foreach(var file in files)
+        {
+            _files.Add(file);
+            //TODO upload the files to the server
         }
     }
     #endregion
