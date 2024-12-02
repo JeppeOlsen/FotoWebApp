@@ -26,6 +26,7 @@ else
     <MudItem xs="12" Class="pt-0">
         <MudPaper>
             <MudToolBar Class="justify-end">
+                @* Upload Button *@
                 <MudFileUpload T="IReadOnlyList<IBrowserFile>" FilesChanged="UploadFiles" MaximumFileCount="100" AppendMultipleFiles="true" Accept=".png, .jpg, .gif, .tiff, .tif, .heif, .heic, .bmp">
                     <ActivatorContent>
                         <MudButton Variant="Variant.Filled"
@@ -35,8 +36,11 @@ else
                         </MudButton>
                     </ActivatorContent>
                 </MudFileUpload>
+                @* Spacer *@
                 <MudSpacer />
+                @* Selected Images *@
                 <p>Selected Images: @SelectedImagesCount / @Album.MaxSelectedImages</p>
+                @* Delete Button *@
                 <MudTooltip Text="Delete Project">
                     <MudIconButton Icon="@Icons.Material.Filled.DeleteForever" OnClick="ShowDeleteConfirmation" Color="Color.Error" />
                 </MudTooltip>
