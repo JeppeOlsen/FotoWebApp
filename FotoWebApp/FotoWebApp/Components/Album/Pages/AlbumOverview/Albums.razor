@@ -7,14 +7,13 @@
 @inject ISnackbar Snackbar
 @rendermode @(new InteractiveServerRenderMode(prerender: false))
 
+<PageTitle>Projects</PageTitle>
+
 @* mudblazor providers for dialogs and snacbars *@
 <MudDialogProvider />
 <MudPopoverProvider />
 <MudSnackbarProvider />
 
-@* <div style="position: fixed; width: 100%; background-color: rgba(39, 39, 47, 1); z-index: 1200; padding: 13px; border-top: 1px solid rgb(23, 23, 28);">
-    <MudButton @onclick="OpenDialogAsync" Variant="Variant.Filled" Color="Color.Tertiary">Opret Projekt</MudButton>
-</div> *@
 
 @if (albums == null)
 {
@@ -94,7 +93,7 @@ else
         }
         catch (Exception ex)
         {
-            throw;
+            throw ex;
         }
 
     }
@@ -102,7 +101,7 @@ else
     private void SuccesSnackbar()
     {
         Snackbar.Configuration.PositionClass = Defaults.Classes.Position.BottomEnd;
-        Snackbar.Add("Projekt Oprettet", Severity.Success, config => { config.VisibleStateDuration = 5000; });
+        Snackbar.Add("Project Created", Severity.Success, config => { config.VisibleStateDuration = 5000; });
     }
 
     private async Task OpenDialogAsync()
@@ -110,7 +109,7 @@ else
 
         var options = new DialogOptions {CloseButton = true, MaxWidth = MaxWidth.Medium, FullWidth = true};
 
-        var dialog = await DialogService.ShowAsync<AlbumsAddProjectModal>("Opret Projekt", options);
+        var dialog = await DialogService.ShowAsync<AlbumsAddProjectModal>("Create Project", options);
 
         var result = await dialog.Result;
 

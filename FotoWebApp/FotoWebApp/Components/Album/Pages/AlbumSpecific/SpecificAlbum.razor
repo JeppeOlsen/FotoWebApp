@@ -14,7 +14,7 @@
 <MudDialogProvider />
 <MudSnackbarProvider />
 
-<PageTitle>Specific Album</PageTitle>
+<PageTitle>Specific Project</PageTitle>
 @if (Album == null) // If the Album is null
 {
     @* <p><em>Loading...</em></p> // Display a loading message *@
@@ -46,7 +46,7 @@ else
                     <MudCard>
                         <MudCardContent>
                             @* Album Name *@
-                            <MudTextField Label="Album Name" Class="mb-6"
+                            <MudTextField Label="Project Name" Class="mb-6"
                                           @bind-Value="Album.Name" For="@(() => Album.Name)" />
                             @* Customer Info *@
                             <MudTextField Label="Customer Name" Class="mb-3"
@@ -56,7 +56,7 @@ else
                             <MudTextField Label="Customer Phone" Class="mb-6"
                                           @bind-Value="Album.Customer.Phone" For="@(() => Album.Customer.Phone)" />
                             @* Max Selected Images *@
-                            <MudNumericField Label="Max Antal Billeder" Class="mb-6" Variant="Variant.Text"
+                            <MudNumericField Label="Max Number Of Images" Class="mb-6" Variant="Variant.Text"
                                           @bind-Value="Album.MaxSelectedImages" For="@(() => Album.MaxSelectedImages)" />
                             @* Deadline *@
                             <MudDatePicker Label="Deadline" 

@@ -9,16 +9,16 @@
                 <DataAnnotationsValidator /> @* Helper component to validate based on dataannotations on a model class *@
                 <MudCard>
                     <MudCardContent>
-                        <MudTextField Label="Projekt Navn" Class="mb-6"
+                        <MudTextField Label="Project Name" Class="mb-6"
                                       @bind-Value="newAlbum.Name" For="@(() => newAlbum.Name)" />
-                        <MudTextField Label="Kunde Navn" Class="mb-3"
+                        <MudTextField Label="Customer Name" Class="mb-3"
                                       @bind-Value="newCustomer.Name" For="@(() => newCustomer.Name)" />
-                        <MudTextField Label="Kunde Email" Class="mb-3"
+                        <MudTextField Label="Customer Email" Class="mb-3"
                                       @bind-Value="newCustomer.Email" For="@(() => newCustomer.Email)" />
-                        <MudTextField Label="Kunde Telefon" Class="mb-6"
+                        <MudTextField Label="Customer Phone" Class="mb-6"
                                       @bind-Value="newCustomer.Phone" For="@(() => newCustomer.Phone)" />
-                        <MudNumericField Label="Max Antal Billeder" Class="mb-6" Variant="Variant.Text"
-                                    @bind-Value="newAlbum.MaxSelectedImages" For="@(() => newAlbum.MaxSelectedImages)" />
+                        <MudNumericField Label="Max Number Of Images" Class="mb-6" Variant="Variant.Text"
+                                      @bind-Value="newAlbum.MaxSelectedImages" For="@(() => newAlbum.MaxSelectedImages)" />
                         <MudDatePicker Label="Deadline"
                                        DateFormat="dd.MM.yyyy" ShowWeekNumbers="true"
                                        Editable="true" Placeholder="Vælg dato"
@@ -36,6 +36,7 @@
 </MudDialog>
 
 @code {
+
     public Album? newAlbum = new Album();
 
     public Customer? newCustomer = new Customer();
