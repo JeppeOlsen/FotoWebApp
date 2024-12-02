@@ -14,6 +14,9 @@ namespace FotoWebApp.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int ImageId { get; set; }
 
+        public string FileName { get; set; }
+        public Byte[] ImageData { get; set; }
+
         // More properties to be added here
 
         #region Navigation Properties
@@ -21,5 +24,7 @@ namespace FotoWebApp.Models
         public int AlbumId { get; set; }
         public Album Album { get; set; }
         #endregion
+
+
     }
 }
