@@ -38,8 +38,6 @@ else
                 </MudFileUpload>
                 @* Spacer *@
                 <MudSpacer />
-                @* Selected Images *@
-                <p>Selected Images: @SelectedImagesCount / @Album.MaxSelectedImages</p>
                 @* Delete Button *@
                 <MudTooltip Text="Delete Project">
                     <MudIconButton Icon="@Icons.Material.Filled.DeleteForever" OnClick="ShowDeleteConfirmation" Color="Color.Error" />
@@ -94,22 +92,22 @@ else
                         @if (daysLeft == 0)
                         {
                             <svg>
-                                <text class="donut-inner-text" x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="black" font-family="Helvetica" font-size="2">Deadline reached</text>
+                                <text class="donut-inner-text" x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="white" font-family="Helvetica" font-size="2">Deadline reached</text>
                             </svg>
                         }
                         else
                         {
                             <svg>
-                                <text class="donut-inner-text" x="50%" y="35%" dominant-baseline="middle" text-anchor="middle" fill="black" font-family="Helvetica" font-size="2">Days to deadline</text>
-                                <text class="donut-inner-text" x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="black" font-family="Helvetica" font-size="5">@daysLeft</text>
+                                <text class="donut-inner-text" x="50%" y="35%" dominant-baseline="middle" text-anchor="middle" fill="white" font-family="Helvetica" font-size="2">Days to deadline</text>
+                                <text class="donut-inner-text" x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="white" font-family="Helvetica" font-size="5">@daysLeft</text>
                             </svg>
                         }
                     </CustomGraphics>
                 </MudChart>
                 <MudChart ChartOptions="@SelectedImagesBarOptions" ChartType="ChartType.Donut" Width="300px" Height="300px" InputData="@SelectedImagesData" InputLabels="@SelectedImagesLabels">
                     <CustomGraphics>
-                        <text class="donut-inner-text" x="47%" y="35%" dominant-baseline="middle" text-anchor="middle" fill="black" font-family="Helvetica" font-size="2">Total</text>
-                        <text class="donut-inner-text" x="47%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="black" font-family="Helvetica" font-size="5">@SelectedImagesCount / @Album.MaxSelectedImages</text>
+                        <text class="donut-inner-text" x="50%" y="35%" dominant-baseline="middle" text-anchor="middle" fill="white" font-family="Helvetica" font-size="2">Total</text>
+                        <text class="donut-inner-text" x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="white" font-family="Helvetica" font-size="5">@SelectedImagesCount / @Album.MaxSelectedImages</text>
                     </CustomGraphics>
                 </MudChart>
             </MudPaper>
@@ -134,51 +132,6 @@ else
 @code {
     public int SelectedImagesCount { get; set; } = 0; // TODO: Get from database / count of approved images
 
-    // Options and logic for Images bar chart
-    public double[] SelectedImagesData;
-    public string[] SelectedImagesLabels = { "Selected Images", "Unselected Images" };
-    public ChartOptions SelectedImagesBarOptions = new ChartOptions() { ChartPalette = new[] { "#1ec8a4", "#ff4181" } };
-
-    // Options and logic for Deadline bar chart
-    public double[] DeadlineData;
-    public double daysLeft;
-    public string[] DeadlineLabels
-    {
-        get
-        {
-            if (daysLeft == 0)
-            {
-                return new[] { "Deadline" };
-            }
-            else
-            {
-                return new[] { "Days Left", "Deadline" };
-            }
-        }
-    }
-    public ChartOptions DeadlineBarOptions
-    {
-        get
-        {
-            if (daysLeft == 0)
-            {
-                // Modify the ChartOptions when daysLeft is 0
-                return new ChartOptions()
-                    {
-                        ChartPalette = new[] { "#ff4181" }
-                    };
-            }
-            else
-            {
-                // Default ChartOptions
-                return new ChartOptions()
-                    {
-                        ChartPalette = new[] { "#1ec8a4" }
-                    };
-            }
-        }
-    }
-
     [Parameter] // Supply the AlbumId from the query string
     public int AlbumId { get; set; }
 
@@ -195,7 +148,7 @@ else
         Album ??= await dbContext.Albums
             .Include(Album => Album.Customer) // Include the Customer navigation property
             .Include(Album => Album.Photographer) // Include the Photographer navigation property
-            .Include(Album => Album.Images) // Include the Images navigation property (should probably be lazily loaded later on)
+            /* .Include(Album => Album.Images) */ // Include the Images navigation property (should probably be lazily loaded later on)
             .FirstOrDefaultAsync(Album => Album.AlbumId == AlbumId);
 
         // If the Album does not exist, navigate to the notfound page
@@ -309,6 +262,53 @@ else
         {
             _files.Add(file);
             //TODO upload the files to the server
+        }
+    }
+    #endregion
+
+    #region Options and logic for bar charts
+    // Options and logic for Images bar chart
+    public double[] SelectedImagesData;
+    public string[] SelectedImagesLabels = { "Selected Images", "Unselected Images" };
+    public ChartOptions SelectedImagesBarOptions = new ChartOptions() { ChartPalette = new[] { "#1ec8a4", "#ff4181" } };
+
+    // Options and logic for Deadline bar chart
+    public double[] DeadlineData;
+    public double daysLeft;
+    public string[] DeadlineLabels
+    {
+        get
+        {
+            if (daysLeft == 0)
+            {
+                return new[] { "Deadline" };
+            }
+            else
+            {
+                return new[] { "Days Left", "Deadline" };
+            }
+        }
+    }
+    public ChartOptions DeadlineBarOptions
+    {
+        get
+        {
+            if (daysLeft == 0)
+            {
+                // Modify the ChartOptions when daysLeft is 0
+                return new ChartOptions()
+                    {
+                        ChartPalette = new[] { "#ff4181" }
+                    };
+            }
+            else
+            {
+                // Default ChartOptions
+                return new ChartOptions()
+                    {
+                        ChartPalette = new[] { "#1ec8a4" }
+                    };
+            }
         }
     }
     #endregion
