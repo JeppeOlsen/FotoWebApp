@@ -38,8 +38,6 @@ else
                 </MudFileUpload>
                 @* Spacer *@
                 <MudSpacer />
-                @* Selected Images *@
-                <p>Selected Images: @SelectedImagesCount / @Album.MaxSelectedImages</p>
                 @* Delete Button *@
                 <MudTooltip Text="Delete Project">
                     <MudIconButton Icon="@Icons.Material.Filled.DeleteForever" OnClick="ShowDeleteConfirmation" Color="Color.Error" />
@@ -86,21 +84,43 @@ else
         </EditForm>
     </MudItem>
 
-    @* Upload Area *@
+    @* Statistics Area *@
     <MudItem xs="12" sm="8">
         <MudPaper Class="d-flex align-center justify-center mud-width-full mud-height-full py-8">
-            xs=12 sm=8
-        </MudPaper>
+                <MudChart ChartOptions="@DeadlineBarOptions" ChartType="ChartType.Donut" Width="300px" Height="300px" InputData="@DeadlineData" InputLabels="@DeadlineLabels">
+                    <CustomGraphics>
+                        @if (daysLeft == 0)
+                        {
+                            <svg>
+                                <text class="donut-inner-text" x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="white" font-family="Helvetica" font-size="2">Deadline reached</text>
+                            </svg>
+                        }
+                        else
+                        {
+                            <svg>
+                                <text class="donut-inner-text" x="50%" y="35%" dominant-baseline="middle" text-anchor="middle" fill="white" font-family="Helvetica" font-size="2">Days to deadline</text>
+                                <text class="donut-inner-text" x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="white" font-family="Helvetica" font-size="5">@daysLeft</text>
+                            </svg>
+                        }
+                    </CustomGraphics>
+                </MudChart>
+                <MudChart ChartOptions="@SelectedImagesBarOptions" ChartType="ChartType.Donut" Width="300px" Height="300px" InputData="@SelectedImagesData" InputLabels="@SelectedImagesLabels">
+                    <CustomGraphics>
+                        <text class="donut-inner-text" x="50%" y="35%" dominant-baseline="middle" text-anchor="middle" fill="white" font-family="Helvetica" font-size="2">Total</text>
+                        <text class="donut-inner-text" x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="white" font-family="Helvetica" font-size="5">@SelectedImagesCount / @Album.MaxSelectedImages</text>
+                    </CustomGraphics>
+                </MudChart>
+            </MudPaper>
     </MudItem>
 
     @* Photos Area *@ @* TODO: Skal laves cool *@
     <MudItem xs="12">
         <MudGrid Justify="Justify.FlexStart">
-            @for (int i = 0; i < ImagesCount; i++)
+            @foreach(var img in SampleImages)
             {
             <MudItem xs="12" sm="12" md="6" lg="6" xl="4" xxl="2" Style="">
                 <MudPaper>
-                        <MudImage Class="rounded-lg" Src=@GetRandomImgSrc() Style="display: block; height: 210px; max-width: auto; margin-left: auto; margin-right: auto;"/>
+                        <MudImage Class="rounded-lg" Src=@img.Value Style="display: block; height: 210px; max-width: auto; margin-left: auto; margin-right: auto;"/>
                 </MudPaper>
             </MudItem>
             }
@@ -128,44 +148,33 @@ else
         Album ??= await dbContext.Albums
             .Include(Album => Album.Customer) // Include the Customer navigation property
             .Include(Album => Album.Photographer) // Include the Photographer navigation property
-            // .Include(Album => Album.Images) // Include the Images navigation property (should probably be lazily loaded later on)
-            .FirstOrDefaultAsync(Album => Album.AlbumId == AlbumId); 
+            /* .Include(Album => Album.Images) */ // Include the Images navigation property (should probably be lazily loaded later on)
+            .FirstOrDefaultAsync(Album => Album.AlbumId == AlbumId);
 
         // If the Album does not exist, navigate to the notfound page
         if (Album is null)
         {
             NavigationManager.NavigateTo("notfound");
         }
+
+        // Set data for deadline barchart
+
+        // Calculate the time differences
+        var now = DateTime.Now;
+        var deadline = Album.Deadline.Value;
+
+        daysLeft = Math.Max(0, Math.Ceiling((deadline - now).TotalDays));
+
+        // Populate DeadlineData
+        DeadlineData = new[] { daysLeft };
+
+        // TODO Get how many images that is selcted for a project
+
+        double maxSelectedImages = Album.MaxSelectedImages;
+        // Set data for images bar chart
+        SelectedImagesData = new[] {0, maxSelectedImages};
+
     }    
-
-    #region Upload Images
-    // IList<IBrowserFile> _files = new List<IBrowserFile>();
-
-    private long MaxFileSize = 1024 * 1024 * 20; // 20 MB
-    private void UploadFiles(IReadOnlyList<IBrowserFile> files)
-    {
-        // foreach (var file in files)
-        // {
-        //     // _files.Add(file);
-        //     //TODO upload the files to the server
-        //     Album!.Images.Add(new Image() { FileName = file.Name, ImageData = ReadFully(file.OpenReadStream()) });
-        // }
-    }
-
-    // private byte[] ReadFully(Stream input)
-    // {
-    //     byte[] buffer = new byte[16 * 1024];
-    //     using (MemoryStream ms = new MemoryStream())
-    //     {
-    //         int read;
-    //         while ((read = input.Read(buffer, 0, buffer.Length)) > 0)
-    //         {
-    //             ms.Write(buffer, 0, read);
-    //         }
-    //         return ms.ToArray();
-    //     }
-    // }
-    #endregion
 
     #region Album Info
 
@@ -192,7 +201,7 @@ else
             }
         }
 
-        // StateHasChanged(); // Refresh the UI
+        //StateHasChanged(); // Refresh the UI
     }
 
     private bool AlbumExists(int albumId)
@@ -203,9 +212,7 @@ else
     #endregion
 
     #region Photos Area
-    int ImagesCount = 10;
-    
-
+      // MOCK images
     private Dictionary<int, string> SampleImages = new Dictionary<int, string>()
     {
         {1, "https://jule-tøj.dk/wp-content/uploads/2024/11/Jule-Sweaters-Bluse-Rudolfs-Roed.jpg"},
@@ -215,13 +222,6 @@ else
         {5, "https://img.pikbest.com/ai/illus_our/20230422/cc5a7c6b641f962c662171f0c2ea6d3b.jpg!sw800"},
         {6, "https://img.freepik.com/premium-photo/beautiful-outdoor-christmas-scene-illustration-christmas-house-with-snow-winter-landscape-village_932772-773.jpg"}
     };
-
-    private string GetRandomImgSrc()
-    {
-        Random random = new Random();
-        int randomIndex = random.Next(1, SampleImages.Count);
-        return SampleImages[randomIndex];
-    }
     #endregion
 
     #region Delete Project
@@ -254,5 +254,62 @@ else
     }
     #endregion
 
-    
+    #region Upload Images
+    IList<IBrowserFile> _files = new List<IBrowserFile>();
+    private void UploadFiles(IReadOnlyList<IBrowserFile> files)
+    {
+        foreach(var file in files)
+        {
+            _files.Add(file);
+            //TODO upload the files to the server
+        }
+    }
+    #endregion
+
+    #region Options and logic for bar charts
+    // Options and logic for Images bar chart
+    public double[] SelectedImagesData;
+    public string[] SelectedImagesLabels = { "Selected Images", "Unselected Images" };
+    public ChartOptions SelectedImagesBarOptions = new ChartOptions() { ChartPalette = new[] { "#1ec8a4", "#ff4181" } };
+
+    // Options and logic for Deadline bar chart
+    public double[] DeadlineData;
+    public double daysLeft;
+    public string[] DeadlineLabels
+    {
+        get
+        {
+            if (daysLeft == 0)
+            {
+                return new[] { "Deadline" };
+            }
+            else
+            {
+                return new[] { "Days Left", "Deadline" };
+            }
+        }
+    }
+    public ChartOptions DeadlineBarOptions
+    {
+        get
+        {
+            if (daysLeft == 0)
+            {
+                // Modify the ChartOptions when daysLeft is 0
+                return new ChartOptions()
+                    {
+                        ChartPalette = new[] { "#ff4181" }
+                    };
+            }
+            else
+            {
+                // Default ChartOptions
+                return new ChartOptions()
+                    {
+                        ChartPalette = new[] { "#1ec8a4" }
+                    };
+            }
+        }
+    }
+    #endregion
 }
