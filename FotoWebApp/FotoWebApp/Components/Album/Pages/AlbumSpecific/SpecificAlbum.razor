@@ -128,7 +128,7 @@ else
         Album ??= await dbContext.Albums
             .Include(Album => Album.Customer) // Include the Customer navigation property
             .Include(Album => Album.Photographer) // Include the Photographer navigation property
-            .Include(Album => Album.Images) // Include the Images navigation property (should probably be lazily loaded later on)
+            // .Include(Album => Album.Images) // Include the Images navigation property (should probably be lazily loaded later on)
             .FirstOrDefaultAsync(Album => Album.AlbumId == AlbumId); 
 
         // If the Album does not exist, navigate to the notfound page
@@ -137,6 +137,35 @@ else
             NavigationManager.NavigateTo("notfound");
         }
     }    
+
+    #region Upload Images
+    // IList<IBrowserFile> _files = new List<IBrowserFile>();
+
+    private long MaxFileSize = 1024 * 1024 * 20; // 20 MB
+    private void UploadFiles(IReadOnlyList<IBrowserFile> files)
+    {
+        // foreach (var file in files)
+        // {
+        //     // _files.Add(file);
+        //     //TODO upload the files to the server
+        //     Album!.Images.Add(new Image() { FileName = file.Name, ImageData = ReadFully(file.OpenReadStream()) });
+        // }
+    }
+
+    // private byte[] ReadFully(Stream input)
+    // {
+    //     byte[] buffer = new byte[16 * 1024];
+    //     using (MemoryStream ms = new MemoryStream())
+    //     {
+    //         int read;
+    //         while ((read = input.Read(buffer, 0, buffer.Length)) > 0)
+    //         {
+    //             ms.Write(buffer, 0, read);
+    //         }
+    //         return ms.ToArray();
+    //     }
+    // }
+    #endregion
 
     #region Album Info
 
@@ -225,15 +254,5 @@ else
     }
     #endregion
 
-    #region Upload Images
-    IList<IBrowserFile> _files = new List<IBrowserFile>();
-    private void UploadFiles(IReadOnlyList<IBrowserFile> files)
-    {
-        foreach(var file in files)
-        {
-            _files.Add(file);
-            //TODO upload the files to the server
-        }
-    }
-    #endregion
+    
 }
