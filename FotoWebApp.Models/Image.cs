@@ -13,11 +13,8 @@ namespace FotoWebApp.Models
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int ImageId { get; set; }
-
+        public string PhotoUrl { get; set; }
         public string FileName { get; set; }
-        public Byte[] ImageData { get; set; }
-
-        // More properties to be added here
 
         #region Navigation Properties
         [ForeignKey("Album")]

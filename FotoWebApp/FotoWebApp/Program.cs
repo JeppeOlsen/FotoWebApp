@@ -5,6 +5,7 @@ using FotoWebApp.Data;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Azure;
 using MudBlazor.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -29,9 +30,19 @@ builder.Services.AddAuthentication(options =>
     })
     .AddIdentityCookies();
 
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+// Database
+var connectionString = builder.Configuration["ConnectionStrings:FotoWebApp:SqlDb"] ?? throw new InvalidOperationException("Connection string 'ConnectionStrings:FotoWebApp:SqlDb' not found.");
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString));
+
+// Azure Blob Storage
+var storageConnection = builder.Configuration["ConnectionStrings:FotoWebApp:Storage"] ?? throw new InvalidOperationException("Connection string 'ConnectionStrings:FotoWebApp:Storage' not found.");
+
+builder.Services.AddAzureClients(azureBuilder =>
+{
+    azureBuilder.AddBlobServiceClient(storageConnection); // Adds a BlobServiceClient to the DI container. Used to interact with Azure Blob Storage.
+});
+
 
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 

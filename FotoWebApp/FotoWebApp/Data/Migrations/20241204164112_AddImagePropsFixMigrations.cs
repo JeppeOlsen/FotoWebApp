@@ -5,7 +5,7 @@
 namespace FotoWebApp.Migrations
 {
     /// <inheritdoc />
-    public partial class AddImageProps : Migration
+    public partial class AddImagePropsFixMigrations : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -17,12 +17,12 @@ namespace FotoWebApp.Migrations
                 nullable: false,
                 defaultValue: "");
 
-            migrationBuilder.AddColumn<byte[]>(
-                name: "ImageData",
+            migrationBuilder.AddColumn<string>(
+                name: "PhotoUrl",
                 table: "Images",
-                type: "varbinary(max)",
+                type: "nvarchar(max)",
                 nullable: false,
-                defaultValue: new byte[0]);
+                defaultValue: "");
         }
 
         /// <inheritdoc />
@@ -33,7 +33,7 @@ namespace FotoWebApp.Migrations
                 table: "Images");
 
             migrationBuilder.DropColumn(
-                name: "ImageData",
+                name: "PhotoUrl",
                 table: "Images");
         }
     }

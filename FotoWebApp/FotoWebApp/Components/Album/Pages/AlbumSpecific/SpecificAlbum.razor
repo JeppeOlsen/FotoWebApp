@@ -2,7 +2,11 @@
 @using Microsoft.EntityFrameworkCore
 @using FotoWebApp.Models
 @using FotoWebApp.Data
+@using Azure.Storage.Blobs
+@using Azure.Storage.Blobs.Models
+@using System.Web
 @rendermode InteractiveServer
+@inject BlobServiceClient blobService
 @inject ApplicationDbContext dbContext // Inject the DbContext to interact with the database
 @inject NavigationManager NavigationManager // Inject the NavigationManager to navigate between pages
 @inject IDialogService DialogService
@@ -122,17 +126,28 @@ else
         @* Photos Area *@ @* TODO: Skal laves cool *@
         <MudItem xs="12">
             <MudGrid Justify="Justify.FlexStart">
-                @foreach(var img in SampleImages)
+                @if (Album?.Images == null || Album.Images.Count == 0)
                 {
-                <MudItem xs="12" sm="12" md="6" lg="6" xl="4" xxl="2" Style="">
-                    <MudPaper>
-                            <MudImage Class="rounded-lg" Src=@img.Value Style="display: block; height: 210px; max-width: auto; margin-left: auto; margin-right: auto;"/>
-                    </MudPaper>
-                </MudItem>
+                    <MudItem xs="12">
+                        <MudPaper>
+                            <MudText Typo="Typo.h6">No images uploaded yet</MudText>
+                        </MudPaper>
+                    </MudItem>
+                }
+                else
+                {
+                    @foreach (var img in Album.Images)
+                    {
+                        <MudItem xs="12" sm="12" md="6" lg="6" xl="4" xxl="2" Style="">
+                            <MudPaper>
+                                <MudImage Class="rounded-lg" Src=@img.PhotoUrl Style="display: block; height: 210px; max-width: auto; margin-left: auto; margin-right: auto;" />
+                            </MudPaper>
+                        </MudItem>
+                    }
                 }
             </MudGrid>
         </MudItem>
-        </MudGrid>
+    </MudGrid>
 }
 
 @code {
@@ -261,14 +276,58 @@ else
     #endregion
 
     #region Upload Images
-    IList<IBrowserFile> _files = new List<IBrowserFile>();
-    private void UploadFiles(IReadOnlyList<IBrowserFile> files)
+    string loggedInUser = "test-photographer"; // TODO: Get the logged in user
+    int maxAllowedSize = 2 * 1024 * 1024; // 2 MB. TODO: Get from settings
+
+    string baseUri = "https://stfotowebappeu001.blob.core.windows.net"; // TODO: Get from settings
+
+    private async Task UploadFiles(IReadOnlyList<IBrowserFile> files)
     {
-        foreach(var file in files)
+        var containerClient = blobService.GetBlobContainerClient(loggedInUser);
+
+        await containerClient.CreateIfNotExistsAsync(PublicAccessType.Blob);
+
+        foreach (var file in files)
         {
-            _files.Add(file);
-            //TODO upload the files to the server
+            string fileName = file.Name;
+            var result = await containerClient.UploadBlobAsync(fileName, file.OpenReadStream(maxAllowedSize: maxAllowedSize));
+
+            // Encode the filename to make it URI-safe
+            string encodedFileName = HttpUtility.UrlEncode(fileName)
+            .Replace("+", "%20")  // Replace spaces
+            .Replace("(", "%28") // Replace '('
+            .Replace(")", "%29"); // Replace ')'
+            System.Diagnostics.Debug.WriteLine($"Encoded filename: '{fileName}' to '{encodedFileName}'");
+
+            // Combine the base URI with the encoded filename
+            string fileUri = $"{baseUri}/{loggedInUser}/{encodedFileName}";
+            System.Diagnostics.Debug.WriteLine($"File URI: '{fileUri}'");
+
+            // Save the image to the database
+            Album.Images.Add(new Image { PhotoUrl = fileUri, FileName = fileName });
         }
+
+        // Save the changes to the database
+        dbContext.Attach(Album!).State = EntityState.Modified; // Attach the Album to the DbContext and set the state to modified
+
+        try
+        {
+            await dbContext.SaveChangesAsync(); // Save the changes to the database
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!AlbumExists(Album!.AlbumId)) // Check if the Album exists
+            {
+                NavigationManager.NavigateTo("error"); // Navigate to the error page if the Album does not exist"
+            }
+            else
+            {
+                throw;
+            }
+        }
+
+        // Refresh the UI
+        StateHasChanged();
     }
     #endregion
 
