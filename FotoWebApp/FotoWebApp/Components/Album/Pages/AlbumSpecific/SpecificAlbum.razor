@@ -2,7 +2,11 @@
 @using Microsoft.EntityFrameworkCore
 @using FotoWebApp.Models
 @using FotoWebApp.Data
+@using Azure.Storage.Blobs
+@using Azure.Storage.Blobs.Models
+@using System.Web
 @rendermode InteractiveServer
+@inject BlobServiceClient blobService
 @inject ApplicationDbContext dbContext // Inject the DbContext to interact with the database
 @inject NavigationManager NavigationManager // Inject the NavigationManager to navigate between pages
 @inject IDialogService DialogService
@@ -30,8 +34,8 @@ else
                 <MudFileUpload T="IReadOnlyList<IBrowserFile>" FilesChanged="UploadFiles" MaximumFileCount="100" AppendMultipleFiles="true" Accept=".png, .jpg, .gif, .tiff, .tif, .heif, .heic, .bmp">
                     <ActivatorContent>
                         <MudButton Variant="Variant.Filled"
-                                   Color="Color.Primary"
-                                   StartIcon="@Icons.Material.Filled.CloudUpload">
+                        Color="Color.Primary"
+                        StartIcon="@Icons.Material.Filled.CloudUpload">
                             Upload Files
                         </MudButton>
                     </ActivatorContent>
@@ -48,45 +52,45 @@ else
 
     <MudGrid Class="pa-4">
 
-    @* Album Info Area *@
-    <MudItem xs="12" sm="4">
-        <EditForm Model="@Album" OnValidSubmit="UpdateAlbum">
-            <DataAnnotationsValidator /> @* Helper component to validate based on dataannotations on a model class *@
-            <MudGrid>
-                <MudItem xs="12">
-                    <MudCard>
-                        <MudCardContent>
-                            @* Album Name *@
-                            <MudTextField Label="Project Name" Class="mb-6"
-                                          @bind-Value="Album.Name" For="@(() => Album.Name)" />
-                            @* Customer Info *@
-                            <MudTextField Label="Customer Name" Class="mb-3"
-                                          @bind-Value="Album.Customer.Name" For="@(() => Album.Customer.Name)" />
-                            <MudTextField Label="Customer Email" Class="mb-3"
-                                          @bind-Value="Album.Customer.Email" For="@(() => Album.Customer.Email)" />
-                            <MudTextField Label="Customer Phone" Class="mb-6"
-                                          @bind-Value="Album.Customer.Phone" For="@(() => Album.Customer.Phone)" />
-                            @* Max Selected Images *@
-                            <MudNumericField Label="Max Number Of Images" Class="mb-6" Variant="Variant.Text"
-                                          @bind-Value="Album.MaxSelectedImages" For="@(() => Album.MaxSelectedImages)" />
-                            @* Deadline *@
-                            <MudDatePicker Label="Deadline" 
+        @* Album Info Area *@
+        <MudItem xs="12" sm="4">
+            <EditForm Model="@Album" OnValidSubmit="UpdateAlbum">
+                <DataAnnotationsValidator /> @* Helper component to validate based on dataannotations on a model class *@
+                <MudGrid>
+                    <MudItem xs="12">
+                        <MudCard>
+                            <MudCardContent>
+                                @* Album Name *@
+                                <MudTextField Label="Project Name" Class="mb-6"
+                                @bind-Value="Album.Name" For="@(() => Album.Name)" />
+                                @* Customer Info *@
+                                <MudTextField Label="Customer Name" Class="mb-3"
+                                @bind-Value="Album.Customer.Name" For="@(() => Album.Customer.Name)" />
+                                <MudTextField Label="Customer Email" Class="mb-3"
+                                @bind-Value="Album.Customer.Email" For="@(() => Album.Customer.Email)" />
+                                <MudTextField Label="Customer Phone" Class="mb-6"
+                                @bind-Value="Album.Customer.Phone" For="@(() => Album.Customer.Phone)" />
+                                @* Max Selected Images *@
+                                <MudNumericField Label="Max Number Of Images" Class="mb-6" Variant="Variant.Text"
+                                @bind-Value="Album.MaxSelectedImages" For="@(() => Album.MaxSelectedImages)" />
+                                @* Deadline *@
+                                <MudDatePicker Label="Deadline" 
                                 DateFormat="dd.MM.yyyy" ShowWeekNumbers="true"
                                 Editable="true" Placeholder="Vælg dato"
                                 @bind-Date="Album.Deadline" />
-                        </MudCardContent>
-                        <MudCardActions>
-                            <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">Save</MudButton>
-                        </MudCardActions>
-                    </MudCard>
-                </MudItem>
-            </MudGrid>
-        </EditForm>
-    </MudItem>
+                            </MudCardContent>
+                            <MudCardActions>
+                                <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">Save</MudButton>
+                            </MudCardActions>
+                        </MudCard>
+                    </MudItem>
+                </MudGrid>
+            </EditForm>
+        </MudItem>
 
-    @* Statistics Area *@
-    <MudItem xs="12" sm="8">
-        <MudPaper Class="d-flex align-center justify-center mud-width-full mud-height-full py-8">
+        @* Statistics Area *@
+        <MudItem xs="12" sm="8">
+            <MudPaper Class="d-flex align-center justify-center mud-width-full mud-height-full py-8">
                 <MudChart ChartOptions="@DeadlineBarOptions" ChartType="ChartType.Donut" Width="300px" Height="300px" InputData="@DeadlineData" InputLabels="@DeadlineLabels">
                     <CustomGraphics>
                         @if (daysLeft == 0)
@@ -111,21 +115,21 @@ else
                     </CustomGraphics>
                 </MudChart>
             </MudPaper>
-    </MudItem>
+        </MudItem>
 
-    @* Photos Area *@ @* TODO: Skal laves cool *@
-    <MudItem xs="12">
-        <MudGrid Justify="Justify.FlexStart">
-            @foreach(var img in SampleImages)
-            {
-            <MudItem xs="12" sm="12" md="6" lg="6" xl="4" xxl="2" Style="">
-                <MudPaper>
-                        <MudImage Class="rounded-lg" Src=@img.Value Style="display: block; height: 210px; max-width: auto; margin-left: auto; margin-right: auto;"/>
-                </MudPaper>
-            </MudItem>
-            }
-        </MudGrid>
-    </MudItem>
+        @* Photos Area *@ @* TODO: Skal laves cool *@
+        <MudItem xs="12">
+            <MudGrid Justify="Justify.FlexStart">
+                @foreach(var img in SampleImages)
+                {
+                    <MudItem xs="12" sm="12" md="6" lg="6" xl="4" xxl="2" Style="">
+                        <MudPaper>
+                            <MudImage Class="rounded-lg" Src=@img.Value Style="display: block; height: 210px; max-width: auto; margin-left: auto; margin-right: auto;"/>
+                        </MudPaper>
+                    </MudItem>
+                }
+            </MudGrid>
+        </MudItem>
     </MudGrid>
 }
 
@@ -212,7 +216,7 @@ else
     #endregion
 
     #region Photos Area
-      // MOCK images
+    // MOCK images
     private Dictionary<int, string> SampleImages = new Dictionary<int, string>()
     {
         {1, "https://jule-tøj.dk/wp-content/uploads/2024/11/Jule-Sweaters-Bluse-Rudolfs-Roed.jpg"},
@@ -255,13 +259,32 @@ else
     #endregion
 
     #region Upload Images
-    IList<IBrowserFile> _files = new List<IBrowserFile>();
-    private void UploadFiles(IReadOnlyList<IBrowserFile> files)
+    string loggedInUser = "test-photographer"; // TODO: Get the logged in user
+    int maxAllowedSize = 2 * 1024 * 1024; // 2 MB. TODO: Get from settings
+
+    string baseUri = "https://stfotowebappeu001.blob.core.windows.net"; // TODO: Get from settings
+
+    private async Task UploadFiles(IReadOnlyList<IBrowserFile> files)
     {
-        foreach(var file in files)
+        var containerClient = blobService.GetBlobContainerClient(loggedInUser);
+
+        await containerClient.CreateIfNotExistsAsync(PublicAccessType.Blob);
+
+        foreach (var file in files)
         {
-            _files.Add(file);
-            //TODO upload the files to the server
+            string fileName = file.Name;
+            var result = await containerClient.UploadBlobAsync(fileName, file.OpenReadStream(maxAllowedSize: maxAllowedSize));
+
+            // Encode the filename to make it URI-safe
+            string encodedFileName = HttpUtility.UrlEncode(fileName)
+            .Replace("+", "%20")  // Replace spaces
+            .Replace("(", "%28") // Replace '('
+            .Replace(")", "%29"); // Replace ')'
+            System.Diagnostics.Debug.WriteLine($"Encoded filename: '{fileName}' to '{encodedFileName}'");
+
+            // Combine the base URI with the encoded filename
+            string fileUri = $"{baseUri}/{loggedInUser}/{encodedFileName}";
+            System.Diagnostics.Debug.WriteLine($"File URI: '{fileUri}'");
         }
     }
     #endregion
