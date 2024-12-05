@@ -30,7 +30,7 @@ namespace FotoWebApp.Models
         public int PhotographerId { get; set; }
         public Photographer Photographer { get; set; }
 
-        public ICollection<Image> Images { get; set; }
+        public ICollection<Image> Images { get; set; } = new List<Image>();
         #endregion
     }
 }
