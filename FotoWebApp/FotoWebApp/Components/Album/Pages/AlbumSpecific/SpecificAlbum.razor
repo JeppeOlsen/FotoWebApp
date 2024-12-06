@@ -159,6 +159,10 @@ else
     [SupplyParameterFromForm] // Supply the Album from the form
     public Album? Album { get; set; }
 
+    private string containerName; // Declare without initializing
+    private const int maxAllowedSize = 2 * 1024 * 1024; // 2 MB. TODO: Get from settings
+    private const string baseUri = "https://stfotowebappeu001.blob.core.windows.net"; // TODO: Get from settings
+
     // This method is called when the component is initialized
     protected override async Task OnInitializedAsync()
     {
@@ -177,6 +181,8 @@ else
         {
             NavigationManager.NavigateTo("notfound");
         }
+
+        containerName = $"album{Album.AlbumId}";
 
         // Set data for deadline barchart
 
@@ -276,14 +282,10 @@ else
     #endregion
 
     #region Upload Images
-    string loggedInUser = "test-photographer"; // TODO: Get the logged in user
-    int maxAllowedSize = 2 * 1024 * 1024; // 2 MB. TODO: Get from settings
-
-    string baseUri = "https://stfotowebappeu001.blob.core.windows.net"; // TODO: Get from settings
 
     private async Task UploadFiles(IReadOnlyList<IBrowserFile> files)
     {
-        var containerClient = blobService.GetBlobContainerClient(loggedInUser);
+        var containerClient = blobService.GetBlobContainerClient(containerName);
 
         await containerClient.CreateIfNotExistsAsync(PublicAccessType.Blob);
 
@@ -300,7 +302,7 @@ else
             System.Diagnostics.Debug.WriteLine($"Encoded filename: '{fileName}' to '{encodedFileName}'");
 
             // Combine the base URI with the encoded filename
-            string fileUri = $"{baseUri}/{loggedInUser}/{encodedFileName}";
+            string fileUri = $"{baseUri}/{containerName}/{encodedFileName}";
             System.Diagnostics.Debug.WriteLine($"File URI: '{fileUri}'");
 
             // Save the image to the database
