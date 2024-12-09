@@ -52,12 +52,15 @@ else
         </MudItem>
 
         <MudGrid Class="pa-4">
-        <div class="@_dragClass"
-             style="@_dragStyle"
-             @ondragenter="SetDragClass"
-             @ondragleave="ClearDragClass"
-             @ondrop="HandleDrop">
-        </div>
+
+            <InputFile class="@_dragClass"
+                       style="@_dragStyle"
+                       @ondragenter="SetDragClass"
+                       @ondragleave="ClearDragClass" 
+                       multiple
+                       disabled="@_isDisabled"
+                       OnChange="@HandleDrop" />
+        
         @* Album Info Area *@
         <MudItem xs="12" sm="4">
             <EditForm Model="@Album" OnValidSubmit="UpdateAlbum">
@@ -380,6 +383,8 @@ else
 
     #region Logic for drag and drop
 
+    private IReadOnlyList<IBrowserFile> droppedFiles;
+    private bool _isDisabled = true;
     private const string DefaultDragClass = "absolute";
     private const string DefaultDragStyle = "height: 100vh; width: 100%; left: 0px; top: 0px;";
     private string _dragClass = DefaultDragClass;
@@ -389,16 +394,33 @@ else
     {
         _dragClass = $"{DefaultDragClass} border-2 border-dashed mud-border-primary";
         _dragStyle = $"{DefaultDragStyle} z-index: 1400; background-color: black; opacity: 0.5";
+        _isDisabled = false;
     }
 
     private void ClearDragClass()
     {
         _dragClass = DefaultDragClass;
         _dragStyle = DefaultDragStyle;
+        _isDisabled = true;
     }
-    private void HandleDrop()
+
+    private async Task HandleDrop(InputFileChangeEventArgs e)
     {
-        // Logic for handling the drop event
+        try
+        {
+
+            droppedFiles = e.GetMultipleFiles();
+
+            ClearDragClass();
+
+            await UploadFiles(droppedFiles);
+
+        }
+        catch(Exception error)
+        {
+            throw error;
+        }
+
     }
     #endregion
 }
