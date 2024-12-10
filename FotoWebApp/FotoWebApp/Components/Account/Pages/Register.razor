@@ -20,9 +20,9 @@
 <MudContainer Fixed="true">
     <MudGrid Justify="Justify.Center">
         <MudItem md="6">
-            <StatusMessage Message="@Message" />
+            
             <MudText Typo="Typo.h3" GutterBottom="true">Register</MudText>
-            <EditForm Model="Input" asp-route-returnUrl="@ReturnUrl" method="post" OnValidSubmit="RegisterUser" FormName="register">
+            <EditForm class="mb-4" Model="Input" asp-route-returnUrl="@ReturnUrl" method="post" OnValidSubmit="RegisterUser" FormName="register">
                 <DataAnnotationsValidator />
 
                 <MudText Typo="Typo.body1" GutterBottom="true">Create a new account.</MudText>
@@ -48,6 +48,7 @@
                     </MudItem>
                 </MudGrid>
             </EditForm>
+            <StatusMessage Message="@Message" />
         </MudItem>
     </MudGrid>
 </MudContainer>
