@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations; // Enables data annotations, which are used to configure the database schema and validation rules etc.
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace FotoWebApp.Models
+namespace FotoWebApp.Data.Models
 {
     /// <summary>
     /// This class represents an image entity.

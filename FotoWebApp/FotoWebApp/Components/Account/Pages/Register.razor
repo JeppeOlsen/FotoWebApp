@@ -3,6 +3,7 @@
 @using System.ComponentModel.DataAnnotations
 @using System.Text
 @using System.Text.Encodings.Web
+@using FotoWebApp.Data.Models
 @using Microsoft.AspNetCore.Identity
 @using Microsoft.AspNetCore.WebUtilities
 @using FotoWebApp.Data
@@ -14,6 +15,7 @@
 @inject ILogger<Register> Logger
 @inject NavigationManager NavigationManager
 @inject IdentityRedirectManager RedirectManager
+@inject ApplicationDbContext MyDbContext
 
 <PageTitle>Register</PageTitle>
 
@@ -82,6 +84,20 @@
         }
 
         Logger.LogInformation("User created a new account with password.");
+
+        #region Our Modification To The Original Code
+        // Create a Photographer entity and link it to the ApplicationUser
+        var photographer = new Photographer
+        {
+                Name = Input.Email, // For now we'll use the email as the name
+                UserId = user.Id,
+                ApplicationUser = user
+        };
+
+        // Save the Photographer entity to the database
+        await MyDbContext.Photographers.AddAsync(photographer);
+        await MyDbContext.SaveChangesAsync();
+        #endregion
 
         var userId = await UserManager.GetUserIdAsync(user);
         var code = await UserManager.GenerateEmailConfirmationTokenAsync(user);
