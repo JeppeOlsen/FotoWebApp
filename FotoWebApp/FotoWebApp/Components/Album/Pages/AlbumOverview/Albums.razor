@@ -81,6 +81,8 @@ else
 
     private int loadingBoxes = 30;
 
+    private int photographerId;
+
     // Get album data with customer from DB
     protected override async Task OnInitializedAsync()
     {
@@ -96,18 +98,21 @@ else
 
             if (user != null)
             {
-                albums = await MyDbContext.Albums
-                    .Include(album => album.Customer)
-                    .Where(album => album.Photographer.UserId == user.Id)
-                    .ToListAsync();
+                var photographer = await MyDbContext.Photographers.FirstOrDefaultAsync(p => p.UserId == user.Id);
+                if (photographer != null)
+                {
+                    photographerId = photographer.PhotographerId; // Set the photographer id
+                    albums = await MyDbContext.Albums
+                        .Include(album => album.Customer)
+                        .Where(album => album.PhotographerId == photographer.PhotographerId)
+                        .ToListAsync();
+                }
             }
-
         }
         catch (Exception ex)
         {
             throw ex;
         }
-
     }
 
     private void SuccesSnackbar()
@@ -121,7 +126,12 @@ else
 
         var options = new DialogOptions {CloseButton = true, MaxWidth = MaxWidth.Medium, FullWidth = true};
 
-        var dialog = await DialogService.ShowAsync<AlbumsAddProjectModal>("Create Project", options);
+        var parameters = new DialogParameters
+        {
+            { "PhotographerId", photographerId }
+        };
+
+        var dialog = await DialogService.ShowAsync<AlbumsAddProjectModal>("Create Project", parameters, options);
 
         var result = await dialog.Result;
 
