@@ -1,10 +1,15 @@
 ﻿@page "/Albums"
+@using Microsoft.AspNetCore.Authorization @* For Authorization *@  
+@using Microsoft.AspNetCore.Identity
 @using Microsoft.EntityFrameworkCore
 @using FotoWebApp.Data.Models
 @using FotoWebApp.Data
 @inject ApplicationDbContext MyDbContext
 @inject IDialogService DialogService
 @inject ISnackbar Snackbar
+@inject UserManager<ApplicationUser> UserManager
+@inject SignInManager<ApplicationUser> SignInManager
+@attribute [Authorize]
 @rendermode @(new InteractiveServerRenderMode(prerender: false))
 
 <PageTitle>Projects</PageTitle>
@@ -87,9 +92,16 @@ else
     {
         try
         {
-            albums = await MyDbContext.Albums
-            .Include(x => x.Customer)
-            .ToListAsync();
+            var user = await UserManager.GetUserAsync(SignInManager.Context.User);
+
+            if (user != null)
+            {
+                albums = await MyDbContext.Albums
+                    .Include(album => album.Customer)
+                    .Where(album => album.Photographer.UserId == user.Id)
+                    .ToListAsync();
+            }
+
         }
         catch (Exception ex)
         {
