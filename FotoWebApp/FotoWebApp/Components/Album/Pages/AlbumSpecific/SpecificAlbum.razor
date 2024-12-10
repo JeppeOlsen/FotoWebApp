@@ -1,4 +1,5 @@
 ﻿@page "/albums/{AlbumId:int}"
+@using Microsoft.AspNetCore.Authorization @* For Authorization *@
 @using Microsoft.EntityFrameworkCore
 @using FotoWebApp.Data.Models
 @using FotoWebApp.Data
@@ -10,6 +11,7 @@
 @inject ApplicationDbContext dbContext // Inject the DbContext to interact with the database
 @inject NavigationManager NavigationManager // Inject the NavigationManager to navigate between pages
 @inject IDialogService DialogService
+@attribute [Authorize]
 @* @inject IDbContextFactory<FotoWebApp.Data.ApplicationDbContext> DbFactory // Inject the IDbContextFactory to create a new instance of the DbContext when needed (Scoped). This is recommended because the DbContext is not thread-safe.
 @inject NavigationManager NavigationManager // Inject the NavigationManager to navigate between pages  *@
 

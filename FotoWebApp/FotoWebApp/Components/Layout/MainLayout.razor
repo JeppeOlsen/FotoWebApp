@@ -1,4 +1,8 @@
 ﻿@inherits LayoutComponentBase
+@using Microsoft.AspNetCore.Authorization @* For Authorization *@
+@using Microsoft.AspNetCore.Identity
+@using FotoWebApp.Data.Models
+@using FotoWebApp.Data
 
 <MudThemeProvider @bind-IsDarkMode="@_isDarkMode" Theme="_theme" />
 
@@ -7,10 +11,12 @@
     {
         <MudAppBar Elevation="1">
             <MudText Typo="Typo.h5" Class="ml-3">Grain</MudText>
-            <div class="ml-auto" style="display:flex; align-items:center">
-                <MudText Class="me-6" Typo="Typo.subtitle1">Benjamin</MudText>
-                <MudAvatar Color="Color.Secondary">B</MudAvatar>
-            </div>
+            <AuthorizeView>
+                <div class="ml-auto" style="display:flex; align-items:center">
+                    <MudText Class="me-6" Typo="Typo.subtitle1">@context.User.Identity.Name</MudText>
+                    <MudAvatar Color="Color.Secondary">B</MudAvatar>
+                </div>
+            </AuthorizeView>
         </MudAppBar>
         <MudDrawer @bind-Open="@_open" Variant="DrawerVariant.Mini" ClipMode="DrawerClipMode.Docked" OpenMiniOnHover="true" Elevation="2">
             <NavMenu />
@@ -29,6 +35,7 @@
 
 @code
 {
+    #region Logic for login navigation
     [Inject]
     private NavigationManager NavigationManager { get; set; } = default!;
 
@@ -44,6 +51,9 @@
     // ShowLayout is set to true unless the current URL matches any route in ExcludedRoutes List.
     private bool ShowLayout => !ExcludedRoutes.Any(route => NavigationManager.Uri.Contains(route));
 
+    #endregion
+    
+    #region Open and close drawer
 
     private bool _open = true;
     private MudTheme _theme = new();
@@ -53,6 +63,8 @@
     {
         _open = !_open;
     }
+
+    #endregion
 }
 
 

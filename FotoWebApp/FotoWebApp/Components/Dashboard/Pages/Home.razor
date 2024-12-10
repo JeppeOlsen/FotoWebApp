@@ -1,0 +1,17 @@
+﻿@page "/"
+@using Microsoft.AspNetCore.Authorization @* For Authorization *@
+@using Microsoft.AspNetCore.Identity
+@using FotoWebApp.Data.Models
+@using FotoWebApp.Data
+@attribute [Authorize]
+
+<PageTitle>Home</PageTitle>
+<AuthorizeView>
+    <div class="pa-4">
+        <MudText Typo="Typo.h3" GutterBottom="true">Hello and welcome to Grain @context.User.Identity.Name!</MudText>
+    </div>
+</AuthorizeView>
+
+@code {
+    
+}

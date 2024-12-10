@@ -1,5 +1,5 @@
 ﻿@page "/Albums"
-@using Microsoft.AspNetCore.Authorization @* For Authorization *@  
+@using Microsoft.AspNetCore.Authorization @* For Authorization *@
 @using Microsoft.AspNetCore.Identity
 @using Microsoft.EntityFrameworkCore
 @using FotoWebApp.Data.Models
@@ -9,8 +9,8 @@
 @inject ISnackbar Snackbar
 @inject UserManager<ApplicationUser> UserManager
 @inject SignInManager<ApplicationUser> SignInManager
-@attribute [Authorize]
 @rendermode @(new InteractiveServerRenderMode(prerender: false))
+@attribute [Authorize]
 
 <PageTitle>Projects</PageTitle>
 
