@@ -3,16 +3,19 @@
 <MudThemeProvider @bind-IsDarkMode="@_isDarkMode" Theme="_theme" />
 
 <MudLayout>
-    <MudAppBar Elevation="1">
-        <MudText Typo="Typo.h5" Class="ml-3">Grain</MudText>
-        <div class="ml-auto" style="display:flex; align-items:center">
-            <MudText Class="me-6" Typo="Typo.subtitle1">Benjamin</MudText>
-            <MudAvatar Color="Color.Secondary">B</MudAvatar>
-        </div>
-    </MudAppBar>
-    <MudDrawer @bind-Open="@_open" Variant="DrawerVariant.Mini" ClipMode="DrawerClipMode.Docked" OpenMiniOnHover="true" Elevation="2">
-        <NavMenu />
-    </MudDrawer>
+    @if (ShowLayout)
+    {
+        <MudAppBar Elevation="1">
+            <MudText Typo="Typo.h5" Class="ml-3">Grain</MudText>
+            <div class="ml-auto" style="display:flex; align-items:center">
+                <MudText Class="me-6" Typo="Typo.subtitle1">Benjamin</MudText>
+                <MudAvatar Color="Color.Secondary">B</MudAvatar>
+            </div>
+        </MudAppBar>
+        <MudDrawer @bind-Open="@_open" Variant="DrawerVariant.Mini" ClipMode="DrawerClipMode.Docked" OpenMiniOnHover="true" Elevation="2">
+            <NavMenu />
+        </MudDrawer>
+    }
     <MudMainContent>
         @Body
     </MudMainContent>
@@ -26,6 +29,22 @@
 
 @code
 {
+    [Inject]
+    private NavigationManager NavigationManager { get; set; } = default!;
+
+    // Add routes here if they should not contain appbar and side menu
+    private readonly List<string> ExcludedRoutes = new()
+    {
+    "/Account/Login",
+    "/Account/ForgotPassword",
+    "/Account/Register",
+    "/Account/ResendEmailConfirmation"
+    };
+
+    // ShowLayout is set to true unless the current URL matches any route in ExcludedRoutes List.
+    private bool ShowLayout => !ExcludedRoutes.Any(route => NavigationManager.Uri.Contains(route));
+
+
     private bool _open = true;
     private MudTheme _theme = new();
     private bool _isDarkMode = true;
