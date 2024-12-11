@@ -72,22 +72,22 @@ else
                         <MudCard>
                             <MudCardContent>
                                 @* Album Name *@
-                                <MudTextField Label="Project Name" Class="mb-6"
+                                <MudTextField Class="mb-6"
                                               @bind-Value="Album.Name" For="@(() => Album.Name)" />
                                 @* Customer Info *@
-                                <MudTextField Label="Customer Name" Class="mb-3"
+                                <MudTextField Class="mb-3"
                                               @bind-Value="Album.Customer.Name" For="@(() => Album.Customer.Name)" />
-                                <MudTextField Label="Customer Email" Class="mb-3"
+                                <MudTextField Class="mb-3"
                                               @bind-Value="Album.Customer.Email" For="@(() => Album.Customer.Email)" />
-                                <MudTextField Label="Customer Phone" Class="mb-6"
+                                <MudTextField Class="mb-6"
                                               @bind-Value="Album.Customer.Phone" For="@(() => Album.Customer.Phone)" />
                                 @* Max Selected Images *@
-                                <MudNumericField Label="Max Number Of Images" Class="mb-6" Variant="Variant.Text"
+                                <MudNumericField Class="mb-6" Variant="Variant.Text"
                                               @bind-Value="Album.MaxSelectedImages" For="@(() => Album.MaxSelectedImages)" />
                                 @* Deadline *@
                                 <MudDatePicker Label="Deadline" 
                                     DateFormat="dd.MM.yyyy" ShowWeekNumbers="true"
-                                    Editable="true" Placeholder="Vælg dato"
+                                    Editable="true" Placeholder="day.month.year"
                                     @bind-Date="Album.Deadline" />
                             </MudCardContent>
                             <MudCardActions>

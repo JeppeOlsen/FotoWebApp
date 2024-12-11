@@ -1,5 +1,9 @@
-﻿using System.ComponentModel.DataAnnotations; // Enables data annotations, which are used to configure the database schema and validation rules etc.
+﻿using Microsoft.AspNetCore.Mvc;
+using MudBlazor;
+using System.ComponentModel;
+using System.ComponentModel.DataAnnotations; // Enables data annotations, which are used to configure the database schema and validation rules etc.
 using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.Design;
 
 namespace FotoWebApp.Data.Models
 {
@@ -15,13 +19,25 @@ namespace FotoWebApp.Data.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int AlbumId { get; set; }
 
-
-        [Required]
-        [StringLength(50, MinimumLength = 1, ErrorMessage = "Name must be between 1 and 50 characters")]
+        [Label("Project Title")]
+        [Required(ErrorMessage = "The project title is required")]
+        [StringLength(50, MinimumLength = 1, ErrorMessage = "Project title must be between {2} and {1} characters")]
         public string Name { get; set; }
+
+        [Label("Deadline")]
+        [Required(ErrorMessage = "The deadline is required")]
         public DateTime? Deadline { get; set; }
-        public string AlbumLink { get; set; }
+
+        [Label("Album Link")]
+        [Url]
+        public string? AlbumLink { get; set; }
+
+        [Label("Maximum photos customer is able to select")]
+        [HelpKeyword("The maximum amount of photos the customer is able to select")]
+        [Range(1, 1000, ErrorMessage = "Amount of photos must be between {1} and {2}")]
+        [Required(ErrorMessage = "The maximum amount of photos the customer is able to select is required")]
         public int MaxSelectedImages { get; set; }
+
 
         #region Navigation Properties
         public Customer Customer { get; set; } 
