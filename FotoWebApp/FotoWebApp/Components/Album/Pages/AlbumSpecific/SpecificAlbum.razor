@@ -87,7 +87,7 @@ else
                                 @* Deadline *@
                                 <MudDatePicker Label="Deadline" 
                                     DateFormat="dd.MM.yyyy" ShowWeekNumbers="true"
-                                    Editable="true" Placeholder="day.month.year"
+                                    Editable="true" Placeholder="Select Date"
                                     @bind-Date="Album.Deadline" />
                             </MudCardContent>
                             <MudCardActions>
@@ -143,19 +143,39 @@ else
                 {
                     @foreach (var img in Album.Images)
                     {
-                        <MudItem xs="12" sm="12" md="6" lg="6" xl="4" xxl="2" Style="">
+                        <MudItem xs="12" sm="12" md="6" lg="6" xl="4" xxl="2">
                             <MudPaper>
                                 <MudImage Class="rounded-lg" Src=@img.PhotoUrl Style="display: block; height: 210px; max-width: auto; margin-left: auto; margin-right: auto;" />
+                                <MudButton Variant="Variant.Filled" OnClick="() => OpenImageDialogAsync(img.PhotoUrl)">
+                                    View Photo
+                                </MudButton>
                             </MudPaper>
                         </MudItem>
                     }
                 }
             </MudGrid>
         </MudItem>
+        <style>
+            .blurry-class {
+                backdrop-filter: blur(15px);
+            }
+        </style>
     </MudGrid>
 }
 
 @code {
+    #region Enlarge Photo logic
+
+        private async Task OpenImageDialogAsync(string photourl)
+        {
+        var options = new DialogOptions { BackgroundClass = "blurry-class" };
+        var parameters = new DialogParameters { ["PhotoUrl"] = photourl };
+
+        await DialogService.ShowAsync<ViewImageDialog>("View Photo", parameters, options);
+        }
+
+    # endregion
+
     public int SelectedImagesCount { get; set; } = 0; // TODO: Get from database / count of approved images
 
     [Parameter] // Supply the AlbumId from the query string

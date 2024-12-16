@@ -1,0 +1,14 @@
+﻿@using MudBlazor
+<MudDialog MaxWidth="100%" FullWidth="true" MaxHeight="100%">
+    <DialogContent>
+        <MudImage Src="@PhotoUrl" Style="width: 80vh; height: 80vh; object-fit: contain; display: block; margin: auto;" />
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="() => MudDialog.Close()" Color="Color.Primary">Close</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; } = default!;
+    [Parameter] public string PhotoUrl { get; set; } = string.Empty;
+}
