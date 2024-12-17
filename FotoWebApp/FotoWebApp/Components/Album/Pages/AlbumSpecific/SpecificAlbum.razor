@@ -70,7 +70,7 @@ else
                 <MudGrid>
                     <MudItem xs="12">
                         <MudCard>
-                            <MudCardContent>
+                            <MudCardContent >
                                 @* Album Name *@
                                 <MudTextField Class="mb-6"
                                               @bind-Value="Album.Name" For="@(() => Album.Name)" />
@@ -86,9 +86,9 @@ else
                                               @bind-Value="Album.MaxSelectedImages" For="@(() => Album.MaxSelectedImages)" />
                                 @* Deadline *@
                                 <MudDatePicker Label="Deadline" 
-                                    DateFormat="dd.MM.yyyy" ShowWeekNumbers="true"
-                                    Editable="true" Placeholder="Select Date"
-                                    @bind-Date="Album.Deadline" />
+                                               DateFormat="dd.MM.yyyy" ShowWeekNumbers="true"
+                                               Editable="true" Placeholder="Select Date"
+                                               @bind-Date="Album.Deadline" />
                             </MudCardContent>
                             <MudCardActions>
                                 <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">Save</MudButton>
@@ -143,16 +143,16 @@ else
                 {
                     @foreach (var img in Album.Images)
                     {
-                        <MudItem xs="12" sm="12" md="6" lg="6" xl="4" xxl="2">
+                        <MudItem xs="12" sm="12" md="6" lg="6" xl="4" xxl="2" Style="z-index: 400; cursor:pointer;" @onclick="() => OpenImageDialogAsync(img.PhotoUrl)">
                             <MudPaper>
-                                <MudImage Class="rounded-lg" Src=@img.PhotoUrl Style="display: block; height: 210px; max-width: auto; margin-left: auto; margin-right: auto;" />
-                                <MudButton Variant="Variant.Filled" OnClick="() => OpenImageDialogAsync(img.PhotoUrl)">
+                                <MudImage Class="rounded-lg" Src=@img.PhotoUrl Style="display: block; height: 210px; max-width: auto; margin-left: auto; margin-right: auto;"/>
+                                @* <MudButton Variant="Variant.Filled" OnClick="() => OpenImageDialogAsync(img.PhotoUrl)">
                                     View Photo
-                                </MudButton>
+                                </MudButton> *@
                             </MudPaper>
                         </MudItem>
                     }
-                }
+                }   
             </MudGrid>
         </MudItem>
         <style>
@@ -166,9 +166,11 @@ else
 @code {
     #region Enlarge Photo logic
 
+            
+
         private async Task OpenImageDialogAsync(string photourl)
         {
-        var options = new DialogOptions { BackgroundClass = "blurry-class" };
+        var options = new DialogOptions { BackgroundClass = "blurry-class", CloseButton = true };
         var parameters = new DialogParameters { ["PhotoUrl"] = photourl };
 
         await DialogService.ShowAsync<ViewImageDialog>("View Photo", parameters, options);
