@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations; // Enables data annotations, which are used to configure the database schema and validation rules etc.
+﻿using MudBlazor;
+using System.ComponentModel.DataAnnotations; // Enables data annotations, which are used to configure the database schema and validation rules etc.
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace FotoWebApp.Data.Models
@@ -14,14 +15,19 @@ namespace FotoWebApp.Data.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)] // This attribute specifies that the database will generate the primary key value.
         public int CustomerId { get; set; }
 
-        [Required] // This attribute specifies that the property is required.
-        [StringLength(50, MinimumLength = 1, ErrorMessage = "Name must be between 1 and 50 characters")] // This attribute specifies the maximum and minimum length of the property.
+        [Label("Customer Name")] // This attribute specifies the label of the property.
+        [Required(ErrorMessage = "The customer name is required")] // This attribute specifies that the property is required.
+        [StringLength(50, MinimumLength = 1, ErrorMessage = "Customer Name must be between {2} and {1} characters")] // This attribute specifies the maximum and minimum length of the property.
         public string Name { get; set; }
-        [Required]
-        [StringLength(50, MinimumLength = 1, ErrorMessage = "Email must be between 1 and 50 characters")]
+
+        [Label("Customer Email Address")]
+        [Required(ErrorMessage = "The customer email address is required")]
+        [EmailAddress]
         public string Email { get; set; }
-        [Required]
-        [StringLength(20, MinimumLength = 8, ErrorMessage = "Phone must be between 8 and 20 characters")]
+
+        [Label("Customer Phone Number")]
+        [Required(ErrorMessage = "The customer phone number is required")]
+        [Phone(ErrorMessage = "Invalid phone number format")]
         public string Phone { get; set; }
 
 

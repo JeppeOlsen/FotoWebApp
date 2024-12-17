@@ -1,0 +1,14 @@
+﻿@using MudBlazor
+<MudDialog Style="max-width: 90%; max-height: 90%;">
+    <DialogContent>
+        <MudImage Src="@PhotoUrl" Style="width: 100%; height: 100%; object-fit: contain; display: block; margin: auto;" />
+    </DialogContent>
+    <DialogActions>
+        
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; } = default!;
+    [Parameter] public string PhotoUrl { get; set; } = string.Empty;
+}
