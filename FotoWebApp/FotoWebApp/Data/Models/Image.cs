@@ -15,6 +15,7 @@ namespace FotoWebApp.Data.Models
         public int ImageId { get; set; }
         public string PhotoUrl { get; set; }
         public string FileName { get; set; }
+        public bool Selected { get; set; } = false;
 
         #region Navigation Properties
         [ForeignKey("Album")]

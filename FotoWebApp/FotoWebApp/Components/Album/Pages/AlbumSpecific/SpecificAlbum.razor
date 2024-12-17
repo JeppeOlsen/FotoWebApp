@@ -200,11 +200,15 @@ else
         // Populate DeadlineData
         DeadlineData = new[] { daysLeft };
 
-        // TODO Get how many images that is selcted for a project
+        // Set data for selected images
+        SelectedImagesCount = Album.Images.Where(s => s.Selected == true).Count();
 
+        // Converting to double due to bar charts only accept doubles
         double maxSelectedImages = Album.MaxSelectedImages;
+
         // Set data for images bar chart
-        SelectedImagesData = new[] {0, maxSelectedImages};
+        SelectedImagesData = new[] {SelectedImagesCount, maxSelectedImages - SelectedImagesCount};
+
 
     }    
 

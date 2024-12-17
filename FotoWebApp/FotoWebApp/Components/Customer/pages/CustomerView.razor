@@ -1,0 +1,209 @@
+﻿@page "/Customer/{AlbumLink}"
+@using Microsoft.EntityFrameworkCore
+@using FotoWebApp.Data.Models
+@using FotoWebApp.Data
+@inject ApplicationDbContext dbContext
+@inject NavigationManager NavigationManager
+@inject ISnackbar Snackbar
+@rendermode @(new InteractiveServerRenderMode(prerender: false))
+
+<MudPopoverProvider />
+<MudSnackbarProvider />
+
+
+<MudAppBar Elevation="1">
+    <MudText Typo="Typo.h5">Grain</MudText>
+        <div class="ml-auto" style="display:flex; align-items:center">
+            <MudText Class="me-6" Typo="Typo.subtitle1">Project name</MudText>
+            <MudAvatar Color="Color.Secondary">B</MudAvatar>
+        </div>
+</MudAppBar>
+
+<MudItem xs="12" Class="pt-0 sticky z-10" Style="top: 64px">
+    <MudPaper>
+        <MudToolBar>
+            <MudText>Deadline: @Album?.Deadline?.ToString("dd-MM-yyyy")</MudText>
+           <MudSpacer />
+           <MudText>Time left to pick: @daysleft days</MudText>
+           <MudSpacer />
+            <MudText>Images choosen: @numberOfSelectedImages / @Album?.MaxSelectedImages</MudText>
+        </MudToolBar>
+    </MudPaper>
+</MudItem>
+
+@if (Album == null)
+{
+
+    @* Skeleton render *@
+    <MudGrid Spacing="6" Class="pa-4" style="padding-top: 80px !important;">
+
+        @for (int i = 0; i < loadingBoxes; i++)
+        {
+            <MudItem Style="min-width: 255px">
+                <MudCard>
+                    <MudSkeleton SkeletonType="SkeletonType.Rectangle" Height="200px" />
+                    <MudCardContent>
+                        <MudSkeleton Width="30%" Height="42px;" />
+                        <MudSkeleton Width="80%" />
+                        <MudSkeleton Width="100%" />
+                    </MudCardContent>
+                </MudCard>
+            </MudItem>
+        }
+    </MudGrid>
+
+} else
+{
+
+    <MudGrid Spacing="6" Class="pa-4" Justify="Justify.FlexStart">
+            @foreach (var img in Album.Images)
+            {
+                <MudItem Style="width: 250px;">
+                    <MudCard>
+                        <MudItem Style="position:relative;">
+                            <MudCardMedia Image="@img.PhotoUrl" Height="250" />
+                            <MudOverlay Visible="@(img.Selected)" DarkBackground="true" Absolute="true">
+                                <MudIcon Size="Size.Large" Icon="@Icons.Material.Filled.Check" Color="Color.Tertiary" />
+                            </MudOverlay>
+                        </MudItem>
+                        <MudCardActions>
+                            <MudToggleIconButton @bind-Toggled="@img.Selected"
+                                                 Icon="@Icons.Material.Filled.RadioButtonUnchecked"
+                                                 Color="@Color.Tertiary"
+                                                 ToggledIcon="@Icons.Material.Filled.CheckCircle"
+                                                 ToggledColor="@Color.Tertiary"
+                                                 @onclick="() => ToggleImageSelection(img.ImageId)" />
+                            <MudSpacer />
+                            <MudText>@(img.Selected ? "Approved" : "Not Approved")</MudText>
+                        </MudCardActions>
+                    </MudCard>
+                </MudItem>
+            }
+        </MudGrid>
+}
+
+
+
+@code {
+    public bool Selected { get; set; }
+
+    private int loadingBoxes = 30;
+
+    private double daysleft { get; set; }
+
+    private int numberOfSelectedImages { get; set; }
+
+    [Parameter] // Supply the AlbumLink from the query string
+    public string AlbumLink { get; set; }
+
+    public Album? Album { get; set; }
+
+    private HashSet<int> SelectedImages = new HashSet<int>(); // using A HashSet because of O(1) time complexity and hashset ignores duplicates, where we in a list have to check for it manually
+
+    protected override async Task OnInitializedAsync()
+    {
+        if(AlbumLink == null)
+        {
+            NavigationManager.NavigateTo("notfound");
+            return; // return here due to async Task would continue to run even though we navigate to another page
+        }
+
+        // get images from database that matches the albumlink
+        Album = await dbContext.Albums
+        .Include(Album => Album.Images)
+        .FirstOrDefaultAsync(Album => Album.AlbumLink == AlbumLink);
+
+        if (Album == null)
+        {
+            NavigationManager.NavigateTo("notfound");
+            return; 
+        }
+
+        // Preload selected images and save them to the: hashSet SelectedImages and count how many images that is in the set
+        if (Album != null)
+        {
+            SelectedImages = Album.Images
+                .Where(img => img.Selected)
+                .Select(img => img.ImageId)
+                .ToHashSet();
+
+            numberOfSelectedImages = SelectedImages.Count();
+        }
+
+        // Calculate the time differences
+        var now = DateTime.Now;
+        var deadline = Album.Deadline.Value;
+
+        daysleft = Math.Max(0, Math.Ceiling((deadline - now).TotalDays));
+    }
+
+    private void ToggleImageSelection(int imageId)
+    {
+        // getting data from the local album list loaded in
+        var img = Album?.Images.FirstOrDefault(i => i.ImageId == imageId);
+        if (img == null) return;
+
+        // Sets the selcted value to the oppsit of what it is. If it is true, then it would be set to false and wise versa
+        img.Selected = !img.Selected;
+
+        // Adds or removes the selcted image from the SelectedImages list
+        if (img.Selected)
+        {
+            SelectedImages.Add(imageId);
+            numberOfSelectedImages++;
+            ShowSnacbarSaveChanges();
+        }
+        else
+        {
+            SelectedImages.Remove(imageId);
+            numberOfSelectedImages--;
+            ShowSnacbarSaveChanges();
+        }
+
+        StateHasChanged();
+    }
+
+    private async Task UpdateImg()
+    {
+        try
+        {
+            if (Album == null) return;
+
+            // Batching the update statments and updating the DB from the selctedImages list
+            await dbContext.Images
+                .Where(img => img.AlbumId == Album.AlbumId)
+                .ExecuteUpdateAsync(img => img
+                    .SetProperty(i => i.Selected, i => SelectedImages.Contains(i.ImageId)));
+
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error updating images: {ex.Message}");
+        }
+    }
+
+    private void ShowSnacbarSaveChanges()
+    {
+        Snackbar.Configuration.PositionClass = Defaults.Classes.Position.BottomEnd;
+        Snackbar.Add("You have made changes please save", Severity.Info, config =>
+        {
+            config.Action = "Save";
+            config.ShowCloseIcon = false;
+            config.RequireInteraction = true;
+            config.ActionColor = Color.Transparent;
+            config.Onclick = snackbar =>
+            {
+                UpdateImg();
+                ShowSnacbarSucces();
+                return Task.CompletedTask;
+            };
+        });
+    }
+
+    private void ShowSnacbarSucces()
+    {
+        Snackbar.Add("Saved", Severity.Success);
+    }
+
+}
