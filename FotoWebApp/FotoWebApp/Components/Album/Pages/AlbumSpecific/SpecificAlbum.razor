@@ -187,7 +187,7 @@ else
     public Album? Album { get; set; }
 
     private string containerName; // Declare without initializing
-    private const int maxAllowedSize = 2 * 1024 * 1024; // 2 MB. TODO: Get from settings
+    private const int maxAllowedSize = 10 * 1024 * 1024; // 2 MB. TODO: Get from settings
     private const string baseUri = "https://stfotowebappeu001.blob.core.windows.net"; // TODO: Get from settings
 
     // This method is called when the component is initialized
