@@ -1,4 +1,4 @@
-﻿@page "/Customer/{AlbumLink}"
+﻿@page "/ChooseImages/{AlbumId:int}"
 @using Microsoft.EntityFrameworkCore
 @using FotoWebApp.Data.Models
 @using FotoWebApp.Data
@@ -13,19 +13,19 @@
 
 <MudAppBar Elevation="1">
     <MudText Typo="Typo.h5">Grain</MudText>
-        <div class="ml-auto" style="display:flex; align-items:center">
-            <MudText Class="me-6" Typo="Typo.subtitle1">Project name</MudText>
-            <MudAvatar Color="Color.Secondary">B</MudAvatar>
-        </div>
+    <div class="ml-auto" style="display:flex; align-items:center">
+        <MudText Class="me-6" Typo="Typo.subtitle1">Project name</MudText>
+        <MudAvatar Color="Color.Secondary">B</MudAvatar>
+    </div>
 </MudAppBar>
 
 <MudItem xs="12" Class="pt-0 sticky z-10" Style="top: 64px">
     <MudPaper>
         <MudToolBar>
             <MudText>Deadline: @Album?.Deadline?.ToString("dd-MM-yyyy")</MudText>
-           <MudSpacer />
-           <MudText>Time left to pick: @daysleft days</MudText>
-           <MudSpacer />
+            <MudSpacer />
+            <MudText>Time left to pick: @daysleft days</MudText>
+            <MudSpacer />
             <MudText>Images choosen: @numberOfSelectedImages / @Album?.MaxSelectedImages</MudText>
         </MudToolBar>
     </MudPaper>
@@ -56,30 +56,30 @@
 {
 
     <MudGrid Spacing="6" Class="pa-4" Justify="Justify.FlexStart">
-            @foreach (var img in Album.Images)
-            {
-                <MudItem Style="width: 250px;">
-                    <MudCard>
-                        <MudItem Style="position:relative;">
-                            <MudCardMedia Image="@img.PhotoUrl" Height="250" />
-                            <MudOverlay Visible="@(img.Selected)" DarkBackground="true" Absolute="true">
-                                <MudIcon Size="Size.Large" Icon="@Icons.Material.Filled.Check" Color="Color.Tertiary" />
-                            </MudOverlay>
-                        </MudItem>
-                        <MudCardActions>
-                            <MudToggleIconButton @bind-Toggled="@img.Selected"
-                                                 Icon="@Icons.Material.Filled.RadioButtonUnchecked"
-                                                 Color="@Color.Tertiary"
-                                                 ToggledIcon="@Icons.Material.Filled.CheckCircle"
-                                                 ToggledColor="@Color.Tertiary"
-                                                 @onclick="() => ToggleImageSelection(img.ImageId)" />
-                            <MudSpacer />
-                            <MudText>@(img.Selected ? "Approved" : "Not Approved")</MudText>
-                        </MudCardActions>
-                    </MudCard>
-                </MudItem>
-            }
-        </MudGrid>
+        @foreach (var img in Album.Images)
+        {
+            <MudItem Style="width: 250px;">
+                <MudCard>
+                    <MudItem Style="position:relative;">
+                        <MudCardMedia Image="@img.PhotoUrl" Height="250" />
+                        <MudOverlay Visible="@(img.Selected)" DarkBackground="true" Absolute="true">
+                            <MudIcon Size="Size.Large" Icon="@Icons.Material.Filled.Check" Color="Color.Tertiary" />
+                        </MudOverlay>
+                    </MudItem>
+                    <MudCardActions>
+                        <MudToggleIconButton @bind-Toggled="@img.Selected"
+                        Icon="@Icons.Material.Filled.RadioButtonUnchecked"
+                        Color="@Color.Tertiary"
+                        ToggledIcon="@Icons.Material.Filled.CheckCircle"
+                        ToggledColor="@Color.Tertiary"
+                        @onclick="() => ToggleImageSelection(img.ImageId)" />
+                        <MudSpacer />
+                        <MudText>@(img.Selected ? "Approved" : "Not Approved")</MudText>
+                    </MudCardActions>
+                </MudCard>
+            </MudItem>
+        }
+    </MudGrid>
 }
 
 
@@ -93,8 +93,11 @@
 
     private int numberOfSelectedImages { get; set; }
 
-    [Parameter] // Supply the AlbumLink from the query string
-    public string AlbumLink { get; set; }
+    [Parameter] // Get the AlbumId as a path parameter from the URL
+    public int AlbumId { get; set; }
+
+    [SupplyParameterFromQuery(Name = "Password")] // Get the password from a query parameter 
+    public string? SuppliedPassword { get; set; }
 
     public Album? Album { get; set; }
 
@@ -102,16 +105,28 @@
 
     protected override async Task OnInitializedAsync()
     {
-        if(AlbumLink == null)
+        // Check if the album exists
+        var albumExists = await dbContext.Albums.AnyAsync(a => a.AlbumId == AlbumId);
+        if (!albumExists)
         {
             NavigationManager.NavigateTo("notfound");
-            return; // return here due to async Task would continue to run even though we navigate to another page
+            return;
         }
 
-        // get images from database that matches the albumlink
+        // Validate the password
+        var album = await dbContext.Albums.FirstOrDefaultAsync(a => a.AlbumId == AlbumId);
+        if (album == null || album.LinkPassword != SuppliedPassword)
+        {
+            Snackbar.Add("Invalid password", Severity.Error);
+            await Task.Delay(2000); // Delay to allow the user to see the snackbar message
+            NavigationManager.NavigateTo("error");
+            return;
+        }
+
+        // Load the album and images
         Album = await dbContext.Albums
-        .Include(Album => Album.Images)
-        .FirstOrDefaultAsync(Album => Album.AlbumLink == AlbumLink);
+            .Include(a => a.Images)
+            .FirstOrDefaultAsync(a => a.AlbumId == AlbumId);
 
         if (Album == null)
         {
