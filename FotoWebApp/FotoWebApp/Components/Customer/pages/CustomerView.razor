@@ -63,8 +63,8 @@
                 <MudItem Style="width: 250px;">
                     <MudCard >
                         <MudItem Style="position:relative;" >
-                        <MudCardMedia @onclick="() => OpenImageDialogAsync(img.PhotoUrl, img.FileName)" Style="cursor: zoom-in" Image="@img.PhotoUrl" Height="250" />
-                            <MudOverlay Visible="@(img.Selected)" DarkBackground="true" Absolute="true" @onclick="() => OpenImageDialogAsync(img.PhotoUrl, img.FileName)" Style="cursor: zoom-in">
+                        <MudCardMedia @onclick="() => OpenImageDialogAsync(img.ImageId)" Style="cursor: zoom-in" Image="@img.PhotoUrl" Height="250" />
+                            <MudOverlay Visible="@(img.Selected)" DarkBackground="true" Absolute="true" @onclick="() => OpenImageDialogAsync(img.ImageId)" Style="cursor: zoom-in">
                                 <MudIcon Size="Size.Large" Icon="@Icons.Material.Filled.Check" Color="Color.Tertiary" />
                             </MudOverlay>
                         </MudItem>
@@ -212,12 +212,13 @@
 
     #region Enlarge Photo logic
 
-    private async Task OpenImageDialogAsync(string photourl, string photoName)
+    private async Task OpenImageDialogAsync(int imageId)
     {
+        
         var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.ExtraExtraLarge, FullWidth = true };
-        var parameters = new DialogParameters { ["Album"] = Album, ["ToggleImageSelection"] = (Action<int>)ToggleImageSelection };
+        var parameters = new DialogParameters { ["Album"] = Album, ["ToggleImageSelection"] = (Action<int>)ToggleImageSelection, ["imageId"] = imageId };
 
-        await DialogService.ShowAsync<ViewImageDialog>(photoName, parameters, options);
+        await DialogService.ShowAsync<ViewImageDialog>("", parameters, options);
     }
 
     #endregion
