@@ -1,14 +1,96 @@
 ﻿@using MudBlazor
-<MudDialog Style="max-width: 90%; max-height: 90%;">
+@using FotoWebApp.Data.Models
+@using FotoWebApp.Data
+
+<MudDialog Style="height: 90%">
     <DialogContent>
-        <MudImage Src="@PhotoUrl" Style="width: 100%; height: 100%; object-fit: contain; display: block; margin: auto;" />
+        <MudCarousel Class="mud-width-full" @ref="_carousel" ItemsSource="@Album.Images" Style="height:100%;" ShowArrows="@_arrows" ShowBullets="@_bullets" EnableSwipeGesture="@_enableSwipeGesture" AutoCycle="@_autocycle">
+            <ItemTemplate>
+                <div class="d-flex flex-column justify-center" style="height: 100%; width: 100%;">
+                    <MudImage Src="@context.PhotoUrl" ObjectFit="ObjectFit.None" Style="position:relative;" />
+                    <MudOverlay Visible="@(context.Selected)" DarkBackground="true" Absolute="true">
+                        <MudIcon Size="Size.Large" Icon="@Icons.Material.Filled.Check" Color="Color.Tertiary" />
+                    </MudOverlay>
+                </div>
+            </ItemTemplate>
+        </MudCarousel>
     </DialogContent>
     <DialogActions>
-        
+        @if (_carouselReady && _carousel.SelectedIndex >= 0 && _carousel.SelectedIndex < Album.Images.Count)
+        {
+            <MudToggleIconButton @bind-Toggled="@(Album.Images.FirstOrDefault(img => img.FileName == _carousel.ItemsSource.ElementAt(_carousel.SelectedIndex).FileName).Selected)"
+                                 Icon="@Icons.Material.Filled.RadioButtonUnchecked"
+                                 Color="@Color.Tertiary"
+                                 ToggledIcon="@Icons.Material.Filled.CheckCircle"
+                                 ToggledColor="@Color.Tertiary"
+                                 @onclick="() => ToggleImageSelection(Album.Images.ToList()[_carousel.SelectedIndex].ImageId)" />
+            <MudSpacer />
+            <MudText>@(Album.Images.ToList()[_carousel.SelectedIndex].Selected ? "Approved" : "Not Approved")</MudText>
+        }
+        else
+        {
+            <div>Loading buttons...</div>
+        }
     </DialogActions>
 </MudDialog>
 
+
+
+
+
+
+
 @code {
-    [CascadingParameter] MudDialogInstance MudDialog { get; set; } = default!;
-    [Parameter] public string PhotoUrl { get; set; } = string.Empty;
+
+    private MudCarousel<Image>? _carousel;
+    private bool _arrows = true;
+    private bool _bullets = true;
+    private bool _enableSwipeGesture = true;
+    private bool _autocycle = false;
+
+    private bool _carouselReady = false;
+
+    [CascadingParameter]
+    MudDialogInstance MudDialog { get; set; } = default!;
+
+    [Parameter]
+    public Album? Album { get; set; }
+
+    [Parameter]
+    public Action<int> ToggleImageSelection { get; set; }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            // Delay the state update until the carousel reference is assigned
+            await Task.Delay(50); // Small delay to ensure _carousel is initialized
+            if (_carousel != null)
+            {
+                _carouselReady = true;
+                StateHasChanged(); // Trigger UI update
+            }
+        }
+        System.Diagnostics.Debug.WriteLine(_carousel.SelectedItem);
+    }
+
+    private void HandleCarouselToggle(int index)
+    {
+        // Get the image at the current index
+        var image = Album.Images.ToList()[index];
+
+        if (image == null)
+            return;
+
+        // Toggle the 'Selected' state of the image
+        image.Selected = !image.Selected;
+
+        // Optionally, you can update the backend by calling ToggleImageSelection
+        ToggleImageSelection?.Invoke(image.ImageId);
+
+        // Refresh the UI
+        StateHasChanged();
+    }
+
+
 }

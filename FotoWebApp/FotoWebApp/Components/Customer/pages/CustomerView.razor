@@ -153,14 +153,16 @@
         {
             SelectedImages.Add(imageId);
             numberOfSelectedImages++;
-            ShowSnacbarSaveChanges();
+            
         }
         else
         {
             SelectedImages.Remove(imageId);
             numberOfSelectedImages--;
-            ShowSnacbarSaveChanges();
+            
         }
+
+        ShowSnacbarSaveChanges();
 
         StateHasChanged();
     }
@@ -212,8 +214,8 @@
 
     private async Task OpenImageDialogAsync(string photourl, string photoName)
     {
-        var options = new DialogOptions { CloseButton = true };
-        var parameters = new DialogParameters { ["PhotoUrl"] = photourl };
+        var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.ExtraExtraLarge, FullWidth = true };
+        var parameters = new DialogParameters { ["Album"] = Album, ["ToggleImageSelection"] = (Action<int>)ToggleImageSelection };
 
         await DialogService.ShowAsync<ViewImageDialog>(photoName, parameters, options);
     }
