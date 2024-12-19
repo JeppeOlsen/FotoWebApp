@@ -28,9 +28,8 @@ namespace FotoWebApp.Data.Models
         [Required(ErrorMessage = "The deadline is required")]
         public DateTime? Deadline { get; set; }
 
-        [Label("Album Link")]
-        [Url]
-        public string? AlbumLink { get; set; }
+        [Label("Album Link Password")]
+        public string? LinkPassword { get; set; }
 
         [Label("Maximum photos customer is able to select")]
         [HelpKeyword("The maximum amount of photos the customer is able to select")]

@@ -1,0 +1,38 @@
+﻿@using Data.Models
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JSRuntime // This is needed to call JavaScript functions from C#/Blazor code (e.g. copy to clipboard)
+@inject ISnackbar Snackbar
+
+<MudDialog>
+    <TitleContent>
+        Share Project
+    </TitleContent>
+    <DialogContent>
+        @* Show album link (read only field) *@
+        <MudTextField @bind-Value="@FullUri" Label="Link" ReadOnly="true" Variant="Variant.Outlined"
+                      Adornment="Adornment.End" AdornmentAriaLabel="Copy" AdornmentIcon="@Icons.Material.Filled.ContentCopy" 
+                      OnAdornmentClick="@(() => CopyToClipboard())" />
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Cancel</MudButton>
+        <MudButton Color="Color.Primary" OnClick="Submit">Ok</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter]
+    private MudDialogInstance MudDialog { get; set; }
+
+    [Parameter]
+    public string FullUri { get; set; }
+
+    private void Submit() => MudDialog.Close(DialogResult.Ok(true));
+
+    private void Cancel() => MudDialog.Cancel();
+
+    private async Task CopyToClipboard()
+    {
+        await JSRuntime.InvokeVoidAsync("navigator.clipboard.writeText", FullUri); // "navigator.clipboard.writeText" is a JavaScript function that writes text to the clipboard
+        Snackbar.Add("Link copied to clipboard", Severity.Success); // Show a success message
+    }
+}

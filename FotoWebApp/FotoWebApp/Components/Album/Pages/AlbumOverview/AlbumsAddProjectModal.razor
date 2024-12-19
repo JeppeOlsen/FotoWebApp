@@ -10,19 +10,19 @@
             <MudCard>
                 <MudCardContent>
                     <MudTextField Class="mb-6"
-                        @bind-Value="newAlbum.Name" For="@(() => newAlbum.Name)" />
+                    @bind-Value="newAlbum.Name" For="@(() => newAlbum.Name)" />
                     <MudTextField Class="mb-3"
-                        @bind-Value="newCustomer.Name" For="@(() => newCustomer.Name)" />
+                    @bind-Value="newCustomer.Name" For="@(() => newCustomer.Name)" />
                     <MudTextField Class="mb-3"
-                        @bind-Value="newCustomer.Email" For="@(() => newCustomer.Email)" />
+                    @bind-Value="newCustomer.Email" For="@(() => newCustomer.Email)" />
                     <MudTextField Class="mb-6"
-                        @bind-Value="newCustomer.Phone" For="@(() => newCustomer.Phone)" />
+                    @bind-Value="newCustomer.Phone" For="@(() => newCustomer.Phone)" />
                     <MudNumericField Class="mb-6" Variant="Variant.Text"
-                        @bind-Value="newAlbum.MaxSelectedImages" For="@(() => newAlbum.MaxSelectedImages)" />
+                    @bind-Value="newAlbum.MaxSelectedImages" For="@(() => newAlbum.MaxSelectedImages)" />
                     <MudDatePicker
-                        DateFormat="dd.MM.yyyy" ShowWeekNumbers="true"
-                        Editable="true" Placeholder="day.month.year"
-                        @bind-Date="newAlbum.Deadline" />
+                    DateFormat="dd.MM.yyyy" ShowWeekNumbers="true"
+                    Editable="true" Placeholder="day.month.year"
+                    @bind-Date="newAlbum.Deadline" />
                 </MudCardContent>
                 <MudCardActions>
                     <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Success" Class="ml-auto">Opret nyt projekt</MudButton>
@@ -61,8 +61,10 @@
             // Set the PhotographerId
             newAlbum.PhotographerId = PhotographerId;
 
-            // TODO make unique link for the project and save it to the project/album
-            newAlbum.AlbumLink = "hello1234";
+            // Set the password for the album
+            newAlbum.LinkPassword = Guid.NewGuid().ToString(); // TODO: Generate a random password or let the user set it, or let it be null (effectively making it non-accessible to the public).
+                                                               // for now we generate a random password using Guid.NewGuid(). This is not totally secure, but it is a simple way to generate a random string.
+                                                               // TODO: password generation logic should be moved to a service or a helper class, and should be more secure.
 
             newAlbum.Customer = newCustomer;
 
