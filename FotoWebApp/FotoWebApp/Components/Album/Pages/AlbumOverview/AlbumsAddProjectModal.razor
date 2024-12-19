@@ -62,9 +62,9 @@
             newAlbum.PhotographerId = PhotographerId;
 
             // Set the password for the album
-            newAlbum.LinkPassword = Guid.NewGuid().ToString("N").Substring(0, 8); // TODO: Generate a random password or let the user set it, or let it be null (effectively making it non-accessible to the public).
-                                                                                  // for now we generate a random password using Guid.NewGuid(). This is not totally secure, but it is a simple way to generate a random string.
-                                                                                  // TODO: password generation logic should be moved to a service or a helper class, and should be more secure.
+            newAlbum.LinkPassword = Guid.NewGuid().ToString(); // TODO: Generate a random password or let the user set it, or let it be null (effectively making it non-accessible to the public).
+                                                               // for now we generate a random password using Guid.NewGuid(). This is not totally secure, but it is a simple way to generate a random string.
+                                                               // TODO: password generation logic should be moved to a service or a helper class, and should be more secure.
 
             newAlbum.Customer = newCustomer;
 
