@@ -21,4 +21,11 @@
     <PackageReference Include="Microsoft.Extensions.Azure" Version="1.9.0" />
   </ItemGroup>
 
+
+  <ItemGroup>
+    <Content Update="Components\Customer\pages\ViewImageDialog.razor">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+    </Content>
+  </ItemGroup>
+
 </Project>

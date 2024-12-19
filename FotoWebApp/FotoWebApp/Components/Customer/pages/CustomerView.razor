@@ -5,10 +5,12 @@
 @inject ApplicationDbContext dbContext
 @inject NavigationManager NavigationManager
 @inject ISnackbar Snackbar
+@inject IDialogService DialogService
 @rendermode @(new InteractiveServerRenderMode(prerender: false))
 
 <MudPopoverProvider />
 <MudSnackbarProvider />
+<MudDialogProvider />
 
 
 <MudAppBar Elevation="1">
@@ -59,10 +61,10 @@
             @foreach (var img in Album.Images)
             {
                 <MudItem Style="width: 250px;">
-                    <MudCard>
-                        <MudItem Style="position:relative;">
-                            <MudCardMedia Image="@img.PhotoUrl" Height="250" />
-                            <MudOverlay Visible="@(img.Selected)" DarkBackground="true" Absolute="true">
+                    <MudCard >
+                        <MudItem Style="position:relative;" >
+                        <MudCardMedia @onclick="() => OpenImageDialogAsync(img.PhotoUrl, img.FileName)" Style="cursor: zoom-in" Image="@img.PhotoUrl" Height="250" />
+                            <MudOverlay Visible="@(img.Selected)" DarkBackground="true" Absolute="true" @onclick="() => OpenImageDialogAsync(img.PhotoUrl, img.FileName)" Style="cursor: zoom-in">
                                 <MudIcon Size="Size.Large" Icon="@Icons.Material.Filled.Check" Color="Color.Tertiary" />
                             </MudOverlay>
                         </MudItem>
@@ -205,5 +207,17 @@
     {
         Snackbar.Add("Saved", Severity.Success);
     }
+
+    #region Enlarge Photo logic
+
+    private async Task OpenImageDialogAsync(string photourl, string photoName)
+    {
+        var options = new DialogOptions { CloseButton = true };
+        var parameters = new DialogParameters { ["PhotoUrl"] = photourl };
+
+        await DialogService.ShowAsync<ViewImageDialog>(photoName, parameters, options);
+    }
+
+    #endregion
 
 }
