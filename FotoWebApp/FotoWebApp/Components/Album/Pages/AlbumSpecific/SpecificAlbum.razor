@@ -7,6 +7,7 @@
 @using Azure.Storage.Blobs.Models
 @using System.Web
 @rendermode InteractiveServer
+@inject ISnackbar Snackbar
 @inject BlobServiceClient blobService
 @inject ApplicationDbContext dbContext // Inject the DbContext to interact with the database
 @inject NavigationManager NavigationManager // Inject the NavigationManager to navigate between pages
@@ -38,11 +39,14 @@ else
                         <ActivatorContent>
                             <MudButton Variant="Variant.Filled"
                                        Color="Color.Primary"
-                                       StartIcon="@Icons.Material.Filled.CloudUpload">
-                                Upload Files
+                                       EndIcon="@Icons.Material.Filled.CloudUpload"
+                                       Class="mr-2">
+                                Upload Images
                             </MudButton>
                         </ActivatorContent>
                     </MudFileUpload>
+                    @* Share Project Button *@
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" EndIcon="@Icons.Material.Filled.IosShare" OnClick="ShowShareProjectDialogAsync">Share Project</MudButton>
                     @* Spacer *@
                     <MudSpacer />
                     @* Delete Button *@
@@ -164,6 +168,21 @@ else
 }
 
 @code {
+    #region Share Project Dialog
+    private async Task ShowShareProjectDialogAsync()
+    {
+        var parameters = new DialogParameters
+        {
+            { "FullUri", $"{NavigationManager.BaseUri}ChooseImages/{Album!.AlbumId}?Password={Album.LinkPassword}" }
+        };
+
+        var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Medium, FullWidth = true };
+
+        await DialogService.ShowAsync<ShareProjectDialog>("Share Project", parameters, options);
+    }
+    #endregion
+
+
     #region Enlarge Photo logic
 
             
