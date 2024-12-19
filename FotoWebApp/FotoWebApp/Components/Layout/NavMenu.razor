@@ -5,6 +5,18 @@
 <MudNavMenu>
     <MudNavLink Href="" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Dashboard">Dashboard</MudNavLink>
     <MudNavLink Href="albums" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Folder">Projects</MudNavLink>
+    <AuthorizeView>
+        <Authorized>
+            <MudNavLink Href="Account/Manage" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Person">@context.User.Identity?.Name</MudNavLink>
+            <form action="Account/Logout" method="post">
+                <AntiforgeryToken />
+                <input type="hidden" name="ReturnUrl" value="@currentUrl" />
+                <button type="submit" class="mud-nav-link mud-ripple">
+                    <MudIcon Icon="@Icons.Material.Filled.Logout" Color="Color.Info" Class="mr-3"></MudIcon> Logout
+                </button>
+            </form>
+        </Authorized>
+    </AuthorizeView>
 </MudNavMenu>
 
 
