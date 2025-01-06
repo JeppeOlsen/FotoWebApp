@@ -46,7 +46,9 @@ else
                         </ActivatorContent>
                     </MudFileUpload>
                     @* Share Project Button *@
-                <MudButton Variant="Variant.Filled" Color="Color.Primary" EndIcon="@Icons.Material.Filled.IosShare" OnClick="ShowShareProjectDialogAsync">Share Project</MudButton>
+                    <MudButton Variant="Variant.Filled" Color="Color.Primary" EndIcon="@Icons.Material.Filled.IosShare" OnClick="ShowShareProjectDialogAsync" Class="mr-2">Share Project</MudButton>
+                    @* List of selected image filenames button *@
+                    <MudButton Variant="Variant.Filled" Color="Color.Primary" EndIcon="@Icons.Material.Filled.IosShare" OnClick="ShowSelectedImageFileNamesDialogAsync">Selected Images List</MudButton>
                     @* Spacer *@
                     <MudSpacer />
                     @* Delete Button *@
@@ -185,6 +187,20 @@ else
 }
 
 @code {
+    #region Show Selected Image File Names Dialog
+    private async Task ShowSelectedImageFileNamesDialogAsync()
+    {
+        var parameters = new DialogParameters
+        {
+            { "Images", Album!.Images }
+        };
+
+        var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Medium, FullWidth = true };
+
+        await DialogService.ShowAsync<FileNamesListDialog>("Selected Image FileNames", parameters, options);
+    }
+    #endregion
+
     #region Share Project Dialog
     private async Task ShowShareProjectDialogAsync()
     {

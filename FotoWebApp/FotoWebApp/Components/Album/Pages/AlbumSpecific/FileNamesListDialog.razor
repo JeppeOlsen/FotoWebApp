@@ -1,0 +1,63 @@
+﻿@using Data.Models
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JSRuntime // This is needed to call JavaScript functions from C#/Blazor code (e.g. copy to clipboard)
+@inject ISnackbar Snackbar
+
+<MudDialog>
+    <TitleContent>
+        Selected Images List
+    </TitleContent>
+    <DialogContent>
+        <MudTextField T="string" Label="Filenames:" Variant="Variant.Outlined" Text="@ImageFileNames" ReadOnly="true" AutoGrow MaxLines="12"
+                      Adornment="Adornment.End" AdornmentAriaLabel="Copy" AdornmentIcon="@Icons.Material.Filled.ContentCopy"
+                      OnAdornmentClick="@(() => CopyToClipboard())" />
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Cancel</MudButton>
+        <MudButton Color="Color.Primary" OnClick="Submit">Ok</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter]
+    private MudDialogInstance MudDialog { get; set; }
+
+    [Parameter]
+    public IList<Image> Images { get; set; }
+
+    public string ImageFileNames { get; set; }
+
+    private void Submit() => MudDialog.Close(DialogResult.Ok(true));
+
+    private void Cancel() => MudDialog.Cancel();
+
+    private async Task CopyToClipboard()
+    {
+        await JSRuntime.InvokeVoidAsync("navigator.clipboard.writeText", ImageFileNames); // "navigator.clipboard.writeText" is a JavaScript function that writes text to the clipboard
+        Snackbar.Add("Copied to clipboard", Severity.Success); // Show a success message
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Images = Images.Where(img => img.Selected).ToList();
+        ImagesToNewLineString();
+    }
+
+    private void ImagesToCSVString()
+    {
+        ImageFileNames = string.Join(", ", Images.Select(i => i.FileName));
+    }
+
+    private void ImagesToNewLineString()
+    {
+        ImageFileNames = string.Join("\n", Images.Select(i => i.FileName));
+    }
+
+    private void ImagesToSpaceSeperatedString()
+    {
+        ImageFileNames = string.Join(" ", Images.Select(i => i.FileName));
+    }
+}
+
+
+
