@@ -15,9 +15,12 @@
             <AuthorizeView>
                 <MudSpacer />
                 <MudText Class="me-6" Typo="Typo.subtitle1">@context.User.Identity.Name</MudText>
-                <MudAvatar Color="Color.Primary">
-					@GetInitial(context.User.Identity.Name)
-                </MudAvatar>
+                <MudLink Href="@("account/manage")" Underline="Underline.None">
+                    <MudAvatar Color="Color.Primary">
+                        @GetInitial(context.User.Identity.Name)
+                    </MudAvatar>
+                </MudLink>
+                
             </AuthorizeView>
         </MudAppBar>
         <MudDrawer @bind-Open="@_open" Variant="DrawerVariant.Mini" ClipMode="DrawerClipMode.Docked" OpenMiniOnHover="true" Elevation="2">
@@ -80,6 +83,11 @@
         return "X"; 
     }
     #endregion
+
+    private void AvatarOnClick()
+    {
+        NavigationManager.NavigateTo("Account/Manage");
+    }
 }
 
 
