@@ -6,6 +6,13 @@
 @using Azure.Storage.Blobs
 @using Azure.Storage.Blobs.Models
 @using System.Web
+@using SixLabors.ImageSharp;
+@using SixLabors.ImageSharp.Drawing;
+@using SixLabors.ImageSharp.Drawing.Processing;
+@using SixLabors.ImageSharp.Processing;
+@using SixLabors.Fonts;
+@using SixLabors.ImageSharp.PixelFormats;
+
 @rendermode InteractiveServer
 @inject ISnackbar Snackbar
 @inject BlobServiceClient blobService
@@ -25,7 +32,7 @@
 @if (Album == null) // If the Album is null
 {
     @* <p><em>Loading...</em></p> // Display a loading message *@
-    <MudProgressCircular Color="Color.Primary" Size="Size.Large" Indeterminate="true" />
+    <MudProgressCircular Color="MudBlazor.Color.Primary" Size="MudBlazor.Size.Large" Indeterminate="true" />
 }
 else
 {
@@ -38,7 +45,7 @@ else
                     <MudFileUpload T="IReadOnlyList<IBrowserFile>" FilesChanged="UploadFiles" MaximumFileCount="100" AppendMultipleFiles="true" Accept=".png, .jpg, .gif, .tiff, .tif, .heif, .heic, .bmp">
                         <ActivatorContent>
                             <MudButton Variant="Variant.Filled"
-                                       Color="Color.Primary"
+                                       Color="MudBlazor.Color.Primary"
                                        EndIcon="@Icons.Material.Filled.CloudUpload"
                                        Class="mr-2">
                                 Upload Images
@@ -46,14 +53,14 @@ else
                         </ActivatorContent>
                     </MudFileUpload>
                     @* Share Project Button *@
-                    <MudButton Variant="Variant.Filled" Color="Color.Primary" EndIcon="@Icons.Material.Filled.IosShare" OnClick="ShowShareProjectDialogAsync" Class="mr-2">Share Project</MudButton>
+                    <MudButton Variant="Variant.Filled" Color="MudBlazor.Color.Primary" EndIcon="@Icons.Material.Filled.IosShare" OnClick="ShowShareProjectDialogAsync" Class="mr-2">Share Project</MudButton>
                     @* List of selected image filenames button *@
-                    <MudButton Variant="Variant.Filled" Color="Color.Primary" EndIcon="@Icons.Material.Filled.List" OnClick="ShowSelectedImageFileNamesDialogAsync">Selected Images List</MudButton>
+                <MudButton Variant="Variant.Filled" Color="MudBlazor.Color.Primary" EndIcon="@Icons.Material.Filled.List" OnClick="ShowSelectedImageFileNamesDialogAsync">Selected Images List</MudButton>
                     @* Spacer *@
                     <MudSpacer />
                     @* Delete Button *@
                     <MudTooltip Text="Delete Project">
-                        <MudIconButton Icon="@Icons.Material.Filled.DeleteForever" OnClick="ShowDeleteConfirmation" Color="Color.Error" />
+                    <MudIconButton Icon="@Icons.Material.Filled.DeleteForever" OnClick="ShowDeleteConfirmation" Color="MudBlazor.Color.Error" />
                     </MudTooltip>
                 </MudToolBar>
             </MudPaper>
@@ -97,7 +104,7 @@ else
                                                @bind-Date="Album.Deadline" />
                             </MudCardContent>
                             <MudCardActions>
-                                <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">Save</MudButton>
+                                <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="MudBlazor.Color.Primary" Class="ml-auto">Save</MudButton>
                             </MudCardActions>
                         </MudCard>
                     </MudItem>
@@ -151,7 +158,7 @@ else
                         @* Photos Area TAB 1 Uploaded images*@
                         <MudTabs Elevation="2" Rounded="true" ApplyEffectsToContainer="true" PanelClass="pa-6">
                             <MudTabPanel Text="Uploaded images">
-                                    <MudTable Items="@Album.Images" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading" LoadingProgressColor="Color.Info">
+                                <MudTable Items="@Album.Images" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading" LoadingProgressColor="MudBlazor.Color.Info">
                                         <HeaderContent>
                                             <MudTh>Image</MudTh>
                                             <MudTh>Filename</MudTh>
@@ -164,7 +171,7 @@ else
                             </MudTabPanel>
                             @* Photos Area TAB 1 Customer selected images*@
                             <MudTabPanel Text="Selected Images">
-                                    <MudTable Items="@Album.Images" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading" LoadingProgressColor="Color.Info">
+                                <MudTable Items="@Album.Images" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading" LoadingProgressColor="MudBlazor.Color.Info">
                                         <HeaderContent>
                                             <MudTh>Image</MudTh>
                                             <MudTh>Filename</MudTh>
@@ -217,8 +224,6 @@ else
 
 
     #region Enlarge Photo logic
-
-            
 
         private async Task OpenImageDialogAsync(string photourl)
         {
@@ -364,13 +369,45 @@ else
         foreach (var file in files)
         {
             string fileName = file.Name;
-            var result = await containerClient.UploadBlobAsync(fileName, file.OpenReadStream(maxAllowedSize: maxAllowedSize));
+
+            // Add watermark to the uploaded image
+            using var inputStream = file.OpenReadStream(maxAllowedSize: maxAllowedSize);
+            using var outputStream = new MemoryStream();
+
+            try
+            {
+                // Process the image to add a watermark asynchronously
+                await AddWatermarkAsync(inputStream, outputStream, "wwwroot/images/GrainWatermark.png");
+            }
+            catch (Exception ex)
+            {
+                // Handle watermark processing error
+                System.Diagnostics.Debug.WriteLine($"Watermarking failed: {ex.Message}");
+                continue; // Skip this file and move on to the next
+            }
+
+            // Reset the stream position to the beginning before uploading
+            outputStream.Position = 0;
+
+            string uniqueFileName = $"{Guid.NewGuid()}_{fileName}"; // Ensure unique filenames
+
+            try
+            {
+                // Upload the processed image asynchronously
+                var result = await containerClient.UploadBlobAsync(uniqueFileName, outputStream);
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Upload failed: {ex.Message}");
+                continue; // Skip this file and move on to the next
+            }
 
             // Encode the filename to make it URI-safe
-            string encodedFileName = HttpUtility.UrlEncode(fileName)
-            .Replace("+", "%20")  // Replace spaces
-            .Replace("(", "%28") // Replace '('
-            .Replace(")", "%29"); // Replace ')'
+            string encodedFileName = HttpUtility.UrlEncode(uniqueFileName)
+                .Replace("+", "%20")  // Replace spaces
+                .Replace("(", "%28")  // Replace '('
+                .Replace(")", "%29"); // Replace ')'
+
             System.Diagnostics.Debug.WriteLine($"Encoded filename: '{fileName}' to '{encodedFileName}'");
 
             // Combine the base URI with the encoded filename
@@ -378,21 +415,21 @@ else
             System.Diagnostics.Debug.WriteLine($"File URI: '{fileUri}'");
 
             // Save the image to the database
-            Album.Images.Add(new Image { PhotoUrl = fileUri, FileName = fileName });
+            Album.Images.Add(new Data.Models.Image { PhotoUrl = fileUri, FileName = fileName });
         }
 
         // Save the changes to the database
-        dbContext.Attach(Album!).State = EntityState.Modified; // Attach the Album to the DbContext and set the state to modified
+        dbContext.Attach(Album!).State = EntityState.Modified;
 
         try
         {
-            await dbContext.SaveChangesAsync(); // Save the changes to the database
+            await dbContext.SaveChangesAsync();
         }
         catch (DbUpdateConcurrencyException)
         {
-            if (!AlbumExists(Album!.AlbumId)) // Check if the Album exists
+            if (!AlbumExists(Album!.AlbumId))
             {
-                NavigationManager.NavigateTo("error"); // Navigate to the error page if the Album does not exist"
+                NavigationManager.NavigateTo("error");
             }
             else
             {
@@ -402,6 +439,36 @@ else
 
         // Refresh the UI
         StateHasChanged();
+    }
+    #endregion
+
+    #region Watermarking
+    
+    private async Task AddWatermarkAsync(Stream inputStream, Stream outputStream, string watermarkPath)
+    {
+        // Load the main image asynchronously
+        using var image = await SixLabors.ImageSharp.Image.LoadAsync(inputStream);
+
+        // Load the watermark image asynchronously
+        using var watermark = await SixLabors.ImageSharp.Image.LoadAsync(watermarkPath);
+
+        // Resize the watermark to fit the main image if needed
+        int watermarkWidth = image.Width / 4;
+        int watermarkHeight = (int)((double)watermark.Height / watermark.Width * watermarkWidth);
+        watermark.Mutate(wm => wm.Resize(watermarkWidth, watermarkHeight));
+
+        // Define the position to place the watermark (bottom-right corner)
+        var position = new Point(image.Width - watermark.Width - 10, image.Height - watermark.Height - 10);
+
+        // Draw the watermark on the main image
+        image.Mutate(wmi => wmi.DrawImage(watermark, position, new GraphicsOptions
+            {
+                BlendPercentage = 0.5f, // Adjust transparency (50%)
+                Antialias = true
+            }));
+
+        // Save the processed image asynchronously to the output stream
+        await image.SaveAsJpegAsync(outputStream);
     }
     #endregion
 
