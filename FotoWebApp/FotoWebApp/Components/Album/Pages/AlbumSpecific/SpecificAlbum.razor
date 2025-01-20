@@ -38,34 +38,34 @@
 else
 {
 
-        @* Sticky Toolbar? *@
-        <MudItem xs="12" Class="pt-0 sticky z-10" Style="top: 64px">
-            <MudPaper>
-                <MudToolBar Class="justify-end">
-                    @* Upload Button *@
-                    <MudFileUpload T="IReadOnlyList<IBrowserFile>" FilesChanged="UploadFiles" MaximumFileCount="100" AppendMultipleFiles="true" Accept=".png, .jpg, .gif, .tiff, .tif, .heif, .heic, .bmp">
-                        <ActivatorContent>
-                            <MudButton Variant="Variant.Filled"
-                                       Color="MudBlazor.Color.Primary"
-                                       EndIcon="@Icons.Material.Filled.CloudUpload"
-                                       Class="mr-2">
-                                Upload Images
-                            </MudButton>
-                        </ActivatorContent>
-                    </MudFileUpload>
-                    @* Share Project Button *@
-                    <MudButton Variant="Variant.Filled" Color="MudBlazor.Color.Primary" EndIcon="@Icons.Material.Filled.IosShare" OnClick="ShowShareProjectDialogAsync" Class="mr-2">Share Project</MudButton>
-                    @* List of selected image filenames button *@
+    @* Sticky Toolbar? *@
+    <MudItem xs="12" Class="pt-0 sticky z-10" Style="top: 64px">
+        <MudPaper>
+            <MudToolBar Class="justify-end">
+                @* Upload Button *@
+                <MudFileUpload T="IReadOnlyList<IBrowserFile>" FilesChanged="UploadFiles" MaximumFileCount="100" AppendMultipleFiles="true" Accept=".png, .jpg, .gif, .tiff, .tif, .heif, .heic, .bmp">
+                    <ActivatorContent>
+                        <MudButton Variant="Variant.Filled"
+                        Color="MudBlazor.Color.Primary"
+                        EndIcon="@Icons.Material.Filled.CloudUpload"
+                        Class="mr-2">
+                            Upload Images
+                        </MudButton>
+                    </ActivatorContent>
+                </MudFileUpload>
+                @* Share Project Button *@
+                <MudButton Variant="Variant.Filled" Color="MudBlazor.Color.Primary" EndIcon="@Icons.Material.Filled.IosShare" OnClick="ShowShareProjectDialogAsync" Class="mr-2">Share Project</MudButton>
+                @* List of selected image filenames button *@
                 <MudButton Variant="Variant.Filled" Color="MudBlazor.Color.Primary" EndIcon="@Icons.Material.Filled.List" OnClick="ShowSelectedImageFileNamesDialogAsync">Selected Images List</MudButton>
-                    @* Spacer *@
-                    <MudSpacer />
-                    @* Delete Button *@
-                    <MudTooltip Text="Delete Project">
+                @* Spacer *@
+                <MudSpacer />
+                @* Delete Button *@
+                <MudTooltip Text="Delete Project">
                     <MudIconButton Icon="@Icons.Material.Filled.DeleteForever" OnClick="ShowDeleteConfirmation" Color="MudBlazor.Color.Error" />
-                    </MudTooltip>
-                </MudToolBar>
-            </MudPaper>
-        </MudItem>
+                </MudTooltip>
+            </MudToolBar>
+        </MudPaper>
+    </MudItem>
 
     <MudGrid Class="pa-4">
 
@@ -171,24 +171,24 @@ else
                         <MudTabs Elevation="2" Rounded="true" ApplyEffectsToContainer="true" PanelClass="pa-6">
                             <MudTabPanel Text="Uploaded images">
                                 <MudTable Items="@Album.Images" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading" LoadingProgressColor="MudBlazor.Color.Info">
-                                        <HeaderContent>
-                                            <MudTh>Image</MudTh>
-                                            <MudTh>Filename</MudTh>
-                                        </HeaderContent>
-                                        <RowTemplate>
-                                            <MudTd DataLabel="Image"><MudImage Style="cursor: zoom-in" @onclick="() => OpenImageDialogAsync(context.PhotoUrl, context.FileName)" ObjectFit="ObjectFit.Cover" Src="@context.PhotoUrl" Elevation="25" Class="rounded-lg" Width="50" Height="50" /></MudTd>
-                                            <MudTd DataLabel="Filename">@context.FileName</MudTd>
-                                        </RowTemplate>
-                                    </MudTable>
+                                    <HeaderContent>
+                                        <MudTh>Image</MudTh>
+                                        <MudTh>Filename</MudTh>
+                                    </HeaderContent>
+                                    <RowTemplate>
+                                        <MudTd DataLabel="Image"><MudImage Style="cursor: zoom-in" @onclick="() => OpenImageDialogAsync(context.PhotoUrl, context.FileName)" ObjectFit="ObjectFit.Cover" Src="@context.PhotoUrl" Elevation="25" Class="rounded-lg" Width="50" Height="50" /></MudTd>
+                                        <MudTd DataLabel="Filename">@context.FileName</MudTd>
+                                    </RowTemplate>
+                                </MudTable>
                             </MudTabPanel>
                             @* Photos Area TAB 1 Customer selected images*@
                             <MudTabPanel Text="Selected Images">
                                 <MudTable Items="@Album.Images" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading" LoadingProgressColor="MudBlazor.Color.Info">
-                                        <HeaderContent>
-                                            <MudTh>Image</MudTh>
-                                            <MudTh>Filename</MudTh>
-                                        </HeaderContent>
-                                        <RowTemplate>
+                                    <HeaderContent>
+                                        <MudTh>Image</MudTh>
+                                        <MudTh>Filename</MudTh>
+                                    </HeaderContent>
+                                    <RowTemplate>
                                         @if(context.Selected)
                                         {
                                             <MudTd DataLabel="Image"><MudImage Style="cursor: zoom-in" @onclick="() => OpenImageDialogAsync(context.PhotoUrl, context.FileName)" ObjectFit="ObjectFit.Cover" Src="@context.PhotoUrl" Elevation="25" Class="rounded-lg" Width="50" Height="50" /></MudTd>
@@ -237,8 +237,8 @@ else
 
     #region Enlarge Photo logic
 
-        private async Task OpenImageDialogAsync(string photourl)
-        {
+    private async Task OpenImageDialogAsync(string photourl)
+    {
         var options = new DialogOptions { BackgroundClass = "blurry-class", CloseButton = true };
         var parameters = new DialogParameters { ["PhotoUrl"] = photourl };
 
@@ -389,54 +389,42 @@ else
             // Reset the stream position to the beginning before uploading
             outputStream.Position = 0;
 
-            string uniqueFileName = $"{Guid.NewGuid()}_{fileName}"; // Ensure unique filenames
-
             try
             {
                 // Upload the processed image asynchronously
-                var result = await containerClient.UploadBlobAsync(uniqueFileName, outputStream);
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine($"Upload failed: {ex.Message}");
-                continue; // Skip this file and move on to the next
-            }
-
-            try
-            {
-                // Encode the filename to make it URI-safe
-                string encodedFileName = HttpUtility.UrlEncode(uniqueFileName)
-                .Replace("+", "%20")  // Replace spaces
-                .Replace("(", "%28")  // Replace '('
-                .Replace(")", "%29"); // Replace ')'
-
-                System.Diagnostics.Debug.WriteLine($"Encoded filename: '{fileName}' to '{encodedFileName}'");
-
-                // Combine the base URI with the encoded filename
-                string fileUri = $"{baseUri}/{containerName}/{encodedFileName}";
-                System.Diagnostics.Debug.WriteLine($"File URI: '{fileUri}'");
-
-                // Save the image to the database
-                Album.Images.Add(new FotoWebApp.Data.Models.Image { PhotoUrl = fileUri, FileName = fileName });
-
-                // Update the upload progress
-                uploadedFiles++;
-
-                // Refresh the UI
-                StateHasChanged();
+                var result = await containerClient.UploadBlobAsync(fileName, outputStream);
             }
             catch (RequestFailedException ex) when (ex.Status == 409) // Catch the exception when the file already exists
             {
                 Snackbar.Add($"File '{fileName}' already exists. Skipping upload.", Severity.Warning);
+                continue; // Skip this file and move on to the next
             }
-            catch (Exception ex) // Catch all other exceptions (consider removing, as it results in too many random error messages from the framework)
+            catch (Exception ex)
             {
-                #if DEBUG
-                // Snackbar.Add($"An error occurred while uploading '{fileName}': {ex.Message}", Severity.Error);
-                #else
-                // Snackbar.Add($"An error occurred while uploading", Severity.Error);
-                #endif
+                System.Diagnostics.Debug.WriteLine($"Upload failed: {ex.Message}");
+                continue;
             }
+ 
+            // Encode the filename to make it URI-safe
+            string encodedFileName = HttpUtility.UrlEncode(fileName)
+            .Replace("+", "%20")  // Replace spaces
+            .Replace("(", "%28")  // Replace '('
+            .Replace(")", "%29"); // Replace ')'
+
+            System.Diagnostics.Debug.WriteLine($"Encoded filename: '{fileName}' to '{encodedFileName}'");
+
+            // Combine the base URI with the encoded filename
+            string fileUri = $"{baseUri}/{containerName}/{encodedFileName}";
+            System.Diagnostics.Debug.WriteLine($"File URI: '{fileUri}'");
+
+            // Save the image to the database
+            Album.Images.Add(new FotoWebApp.Data.Models.Image { PhotoUrl = fileUri, FileName = fileName });
+
+            // Update the upload progress
+            uploadedFiles++;
+
+            // Refresh the UI
+            StateHasChanged();
         }
 
         // Save the changes to the database
