@@ -1,4 +1,5 @@
 ﻿@page "/albums/{AlbumId:int}"
+@using Azure
 @using Microsoft.AspNetCore.Authorization @* For Authorization *@
 @using Microsoft.EntityFrameworkCore
 @using FotoWebApp.Data.Models
@@ -363,27 +364,43 @@ else
         foreach (var file in files)
         {
             string fileName = file.Name;
-            var result = await containerClient.UploadBlobAsync(fileName, file.OpenReadStream(maxAllowedSize: maxAllowedSize));
 
-            // Encode the filename to make it URI-safe
-            string encodedFileName = HttpUtility.UrlEncode(fileName)
-            .Replace("+", "%20")  // Replace spaces
-            .Replace("(", "%28") // Replace '('
-            .Replace(")", "%29"); // Replace ')'
-            System.Diagnostics.Debug.WriteLine($"Encoded filename: '{fileName}' to '{encodedFileName}'");
+            try
+            {
+                var result = await containerClient.UploadBlobAsync(fileName, file.OpenReadStream(maxAllowedSize: maxAllowedSize));
 
-            // Combine the base URI with the encoded filename
-            string fileUri = $"{baseUri}/{containerName}/{encodedFileName}";
-            System.Diagnostics.Debug.WriteLine($"File URI: '{fileUri}'");
+                // Encode the filename to make it URI-safe
+                string encodedFileName = HttpUtility.UrlEncode(fileName)
+                .Replace("+", "%20")  // Replace spaces
+                .Replace("(", "%28") // Replace '('
+                .Replace(")", "%29"); // Replace ')'
+                System.Diagnostics.Debug.WriteLine($"Encoded filename: '{fileName}' to '{encodedFileName}'");
 
-            // Save the image to the database
-            Album.Images.Add(new Image { PhotoUrl = fileUri, FileName = fileName });
+                // Combine the base URI with the encoded filename
+                string fileUri = $"{baseUri}/{containerName}/{encodedFileName}";
+                System.Diagnostics.Debug.WriteLine($"File URI: '{fileUri}'");
 
-            // Update the upload progress
-            uploadedFiles++;
+                // Save the image to the database
+                Album.Images.Add(new Image { PhotoUrl = fileUri, FileName = fileName });
 
-            // Refresh the UI
-            StateHasChanged();
+                // Update the upload progress
+                uploadedFiles++;
+
+                // Refresh the UI
+                StateHasChanged();
+            }
+            catch (RequestFailedException ex) when (ex.Status == 409) // Catch the exception when the file already exists
+            {
+                Snackbar.Add($"File '{fileName}' already exists. Skipping upload.", Severity.Warning);
+            }
+            catch (Exception ex) // Catch all other exceptions (consider removing, as it results in too many random error messages from the framework)
+            {
+                #if DEBUG
+                // Snackbar.Add($"An error occurred while uploading '{fileName}': {ex.Message}", Severity.Error);
+                #else
+                // Snackbar.Add($"An error occurred while uploading", Severity.Error);
+                #endif
+            }
         }
 
         // Save the changes to the database
@@ -404,14 +421,24 @@ else
                 throw;
             }
         }
+        catch (Exception ex)
+        {
+            #if DEBUG
+            Snackbar.Add($"An error occurred while saving the album: {ex.Message}", Severity.Error);
+            #else
+            Snackbar.Add("An error occurred while saving the album. Please try again.", Severity.Error);
+            #endif
+        }
+        finally 
+        {
+            // Reset the progress indicator variables
+            isUploading = false; // Hide the progress indicator
+            uploadedFiles = 0;
+            totalFiles = 100;
 
-        // Reset the progress indicator variables
-        isUploading = false; // Hide the progress indicator
-        uploadedFiles = 0;
-        totalFiles = 100;
-
-        // Refresh the UI
-        StateHasChanged();
+            // Refresh the UI
+            StateHasChanged();
+        } 
     }
     #endregion
 
