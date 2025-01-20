@@ -30,45 +30,45 @@
 else
 {
 
-        @* Sticky Toolbar? *@
-        <MudItem xs="12" Class="pt-0 sticky z-10" Style="top: 64px">
-            <MudPaper>
-                <MudToolBar Class="justify-end">
-                    @* Upload Button *@
-                    <MudFileUpload T="IReadOnlyList<IBrowserFile>" FilesChanged="UploadFiles" MaximumFileCount="100" AppendMultipleFiles="true" Accept=".png, .jpg, .gif, .tiff, .tif, .heif, .heic, .bmp">
-                        <ActivatorContent>
-                            <MudButton Variant="Variant.Filled"
-                                       Color="Color.Primary"
-                                       EndIcon="@Icons.Material.Filled.CloudUpload"
-                                       Class="mr-2">
-                                Upload Images
-                            </MudButton>
-                        </ActivatorContent>
-                    </MudFileUpload>
-                    @* Share Project Button *@
-                    <MudButton Variant="Variant.Filled" Color="Color.Primary" EndIcon="@Icons.Material.Filled.IosShare" OnClick="ShowShareProjectDialogAsync" Class="mr-2">Share Project</MudButton>
-                    @* List of selected image filenames button *@
-                    <MudButton Variant="Variant.Filled" Color="Color.Primary" EndIcon="@Icons.Material.Filled.List" OnClick="ShowSelectedImageFileNamesDialogAsync">Selected Images List</MudButton>
-                    @* Spacer *@
-                    <MudSpacer />
-                    @* Delete Button *@
-                    <MudTooltip Text="Delete Project">
-                        <MudIconButton Icon="@Icons.Material.Filled.DeleteForever" OnClick="ShowDeleteConfirmation" Color="Color.Error" />
-                    </MudTooltip>
-                </MudToolBar>
-            </MudPaper>
-        </MudItem>
+    @* Sticky Toolbar? *@
+    <MudItem xs="12" Class="pt-0 sticky z-10" Style="top: 64px">
+        <MudPaper>
+            <MudToolBar Class="justify-end">
+                @* Upload Button *@
+                <MudFileUpload T="IReadOnlyList<IBrowserFile>" FilesChanged="UploadFiles" MaximumFileCount="100" AppendMultipleFiles="true" Accept=".png, .jpg, .gif, .tiff, .tif, .heif, .heic, .bmp">
+                    <ActivatorContent>
+                        <MudButton Variant="Variant.Filled"
+                        Color="Color.Primary"
+                        EndIcon="@Icons.Material.Filled.CloudUpload"
+                        Class="mr-2">
+                            Upload Images
+                        </MudButton>
+                    </ActivatorContent>
+                </MudFileUpload>
+                @* Share Project Button *@
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" EndIcon="@Icons.Material.Filled.IosShare" OnClick="ShowShareProjectDialogAsync" Class="mr-2">Share Project</MudButton>
+                @* List of selected image filenames button *@
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" EndIcon="@Icons.Material.Filled.List" OnClick="ShowSelectedImageFileNamesDialogAsync">Selected Images List</MudButton>
+                @* Spacer *@
+                <MudSpacer />
+                @* Delete Button *@
+                <MudTooltip Text="Delete Project">
+                    <MudIconButton Icon="@Icons.Material.Filled.DeleteForever" OnClick="ShowDeleteConfirmation" Color="Color.Error" />
+                </MudTooltip>
+            </MudToolBar>
+        </MudPaper>
+    </MudItem>
 
-        <MudGrid Class="pa-4">
+    <MudGrid Class="pa-4">
 
-            <InputFile class="@_dragClass"
-                       style="@_dragStyle"
-                       @ondragenter="SetDragClass"
-                       @ondragleave="ClearDragClass" 
-                       multiple
-                       disabled="@_isDisabled"
-                       OnChange="@HandleDrop" />
-        
+        <InputFile class="@_dragClass"
+        style="@_dragStyle"
+        @ondragenter="SetDragClass"
+        @ondragleave="ClearDragClass" 
+        multiple
+        disabled="@_isDisabled"
+        OnChange="@HandleDrop" />
+
         @* Album Info Area *@
         <MudItem xs="12" sm="4">
             <EditForm Model="@Album" OnValidSubmit="UpdateAlbum">
@@ -79,22 +79,22 @@ else
                             <MudCardContent >
                                 @* Album Name *@
                                 <MudTextField Class="mb-6"
-                                              @bind-Value="Album.Name" For="@(() => Album.Name)" />
+                                @bind-Value="Album.Name" For="@(() => Album.Name)" />
                                 @* Customer Info *@
                                 <MudTextField Class="mb-3"
-                                              @bind-Value="Album.Customer.Name" For="@(() => Album.Customer.Name)" />
+                                @bind-Value="Album.Customer.Name" For="@(() => Album.Customer.Name)" />
                                 <MudTextField Class="mb-3"
-                                              @bind-Value="Album.Customer.Email" For="@(() => Album.Customer.Email)" />
+                                @bind-Value="Album.Customer.Email" For="@(() => Album.Customer.Email)" />
                                 <MudTextField Class="mb-6"
-                                              @bind-Value="Album.Customer.Phone" For="@(() => Album.Customer.Phone)" />
+                                @bind-Value="Album.Customer.Phone" For="@(() => Album.Customer.Phone)" />
                                 @* Max Selected Images *@
                                 <MudNumericField Class="mb-6" Variant="Variant.Text"
-                                              @bind-Value="Album.MaxSelectedImages" For="@(() => Album.MaxSelectedImages)" />
+                                @bind-Value="Album.MaxSelectedImages" For="@(() => Album.MaxSelectedImages)" />
                                 @* Deadline *@
                                 <MudDatePicker Label="Deadline" 
-                                               DateFormat="dd.MM.yyyy" ShowWeekNumbers="true"
-                                               Editable="true" Placeholder="Select Date"
-                                               @bind-Date="Album.Deadline" />
+                                DateFormat="dd.MM.yyyy" ShowWeekNumbers="true"
+                                Editable="true" Placeholder="Select Date"
+                                @bind-Date="Album.Deadline" />
                             </MudCardContent>
                             <MudCardActions>
                                 <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">Save</MudButton>
@@ -108,30 +108,41 @@ else
         @* Statistics Area *@
         <MudItem xs="12" sm="8">
             <MudPaper Class="d-flex align-center justify-center mud-width-full mud-height-full py-8">
-                    <MudChart ChartOptions="@DeadlineBarOptions" ChartType="ChartType.Donut" Width="300px" Height="300px" InputData="@DeadlineData" InputLabels="@DeadlineLabels">
-                        <CustomGraphics>
-                            @if (daysLeft == 0)
-                            {
-                                <svg>
-                                    <text class="donut-inner-text" x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="white" font-family="Helvetica" font-size="2">Deadline reached</text>
-                                </svg>
-                            }
-                            else
-                            {
-                                <svg>
-                                    <text class="donut-inner-text" x="50%" y="35%" dominant-baseline="middle" text-anchor="middle" fill="white" font-family="Helvetica" font-size="2">Days to deadline</text>
-                                    <text class="donut-inner-text" x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="white" font-family="Helvetica" font-size="5">@daysLeft</text>
-                                </svg>
-                            }
-                        </CustomGraphics>
-                    </MudChart>
-                    <MudChart ChartOptions="@SelectedImagesBarOptions" ChartType="ChartType.Donut" Width="300px" Height="300px" InputData="@SelectedImagesData" InputLabels="@SelectedImagesLabels">
-                        <CustomGraphics>
-                            <text class="donut-inner-text" x="50%" y="35%" dominant-baseline="middle" text-anchor="middle" fill="white" font-family="Helvetica" font-size="2">Total</text>
-                            <text class="donut-inner-text" x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="white" font-family="Helvetica" font-size="5">@SelectedImagesCount / @Album.MaxSelectedImages</text>
-                        </CustomGraphics>
-                    </MudChart>
-                </MudPaper>
+                <MudChart ChartOptions="@DeadlineBarOptions" ChartType="ChartType.Donut" Width="300px" Height="300px" InputData="@DeadlineData" InputLabels="@DeadlineLabels">
+                    <CustomGraphics>
+                        @if (DaysLeft == 0)
+                        {
+                            <svg>
+                                <text class="donut-inner-text" x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="white" font-family="Helvetica" font-size="2">Deadline reached</text>
+                            </svg>
+                        }
+                        else
+                        {
+                            <svg>
+                                <text class="donut-inner-text" x="50%" y="35%" dominant-baseline="middle" text-anchor="middle" fill="white" font-family="Helvetica" font-size="2">Days to deadline</text>
+                                <text class="donut-inner-text" x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="white" font-family="Helvetica" font-size="5">@DaysLeft</text>
+                            </svg>
+                        }
+                    </CustomGraphics>
+                </MudChart>
+                <MudChart ChartOptions="@SelectedImagesBarOptions" ChartType="ChartType.Donut" Width="300px" Height="300px" InputData="@SelectedImagesData" InputLabels="@SelectedImagesLabels">
+                    <CustomGraphics>
+                        <text class="donut-inner-text" x="50%" y="35%" dominant-baseline="middle" text-anchor="middle" fill="white" font-family="Helvetica" font-size="2">Total</text>
+                        <text class="donut-inner-text" x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="white" font-family="Helvetica" font-size="5">@SelectedImagesCount / @Album.MaxSelectedImages</text>
+                    </CustomGraphics>
+                </MudChart>
+            </MudPaper>
+        </MudItem>
+
+        @* Upload Progress Area (hidden when not uploading) *@
+        <MudItem xs="12">
+            @if (isUploading) {
+                <MudProgressLinear Color="Color.Success" Size="Size.Large" Rounded="true" Striped="true" Value="@uploadedFiles" Class="my-6">
+                    <MudText Typo="Typo.subtitle1">
+                        <b>@uploadedFiles of @totalFiles</b>
+                    </MudText>
+                </MudProgressLinear>
+            }
         </MudItem>
 
         @* Photos Area *@
@@ -151,32 +162,32 @@ else
                         @* Photos Area TAB 1 Uploaded images*@
                         <MudTabs Elevation="2" Rounded="true" ApplyEffectsToContainer="true" PanelClass="pa-6">
                             <MudTabPanel Text="Uploaded images">
-                                    <MudTable Items="@Album.Images" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading" LoadingProgressColor="Color.Info">
-                                        <HeaderContent>
-                                            <MudTh>Image</MudTh>
-                                            <MudTh>Filename</MudTh>
-                                        </HeaderContent>
-                                        <RowTemplate>
-                                            <MudTd DataLabel="Image"><MudImage Style="cursor: zoom-in" @onclick="() => OpenImageDialogAsync(context.PhotoUrl, context.FileName)" ObjectFit="ObjectFit.Cover" Src="@context.PhotoUrl" Elevation="25" Class="rounded-lg" Width="50" Height="50" /></MudTd>
-                                            <MudTd DataLabel="Filename">@context.FileName</MudTd>
-                                        </RowTemplate>
-                                    </MudTable>
+                                <MudTable Items="@Album.Images" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading" LoadingProgressColor="Color.Info">
+                                    <HeaderContent>
+                                        <MudTh>Image</MudTh>
+                                        <MudTh>Filename</MudTh>
+                                    </HeaderContent>
+                                    <RowTemplate>
+                                        <MudTd DataLabel="Image"><MudImage Style="cursor: zoom-in" @onclick="() => OpenImageDialogAsync(context.PhotoUrl, context.FileName)" ObjectFit="ObjectFit.Cover" Src="@context.PhotoUrl" Elevation="25" Class="rounded-lg" Width="50" Height="50" /></MudTd>
+                                        <MudTd DataLabel="Filename">@context.FileName</MudTd>
+                                    </RowTemplate>
+                                </MudTable>
                             </MudTabPanel>
                             @* Photos Area TAB 1 Customer selected images*@
                             <MudTabPanel Text="Selected Images">
-                                    <MudTable Items="@Album.Images" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading" LoadingProgressColor="Color.Info">
-                                        <HeaderContent>
-                                            <MudTh>Image</MudTh>
-                                            <MudTh>Filename</MudTh>
-                                        </HeaderContent>
-                                        <RowTemplate>
+                                <MudTable Items="@Album.Images" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading" LoadingProgressColor="Color.Info">
+                                    <HeaderContent>
+                                        <MudTh>Image</MudTh>
+                                        <MudTh>Filename</MudTh>
+                                    </HeaderContent>
+                                    <RowTemplate>
                                         @if(context.Selected)
                                         {
                                             <MudTd DataLabel="Image"><MudImage Style="cursor: zoom-in" @onclick="() => OpenImageDialogAsync(context.PhotoUrl, context.FileName)" ObjectFit="ObjectFit.Cover" Src="@context.PhotoUrl" Elevation="25" Class="rounded-lg" Width="50" Height="50" /></MudTd>
                                             <MudTd DataLabel="Filename">@context.FileName</MudTd>
                                         }
-                                        </RowTemplate>
-                                    </MudTable>
+                                    </RowTemplate>
+                                </MudTable>
                             </MudTabPanel>
                         </MudTabs>
                     </MudItem>
@@ -218,19 +229,19 @@ else
 
     #region Enlarge Photo logic
 
-            
 
-        private async Task OpenImageDialogAsync(string photourl)
-        {
+
+    private async Task OpenImageDialogAsync(string photourl)
+    {
         var options = new DialogOptions { BackgroundClass = "blurry-class", CloseButton = true };
         var parameters = new DialogParameters { ["PhotoUrl"] = photourl };
 
         await DialogService.ShowAsync<ViewImageDialog>("View Photo", parameters, options);
-        }
+    }
 
     # endregion
 
-    public int SelectedImagesCount { get; set; } = 0; // TODO: Get from database / count of approved images
+
 
     [Parameter] // Supply the AlbumId from the query string
     public int AlbumId { get; set; }
@@ -262,37 +273,18 @@ else
             NavigationManager.NavigateTo("notfound");
         }
 
-        containerName = $"album{Album.AlbumId}";
-
-        // Set data for deadline barchart
-
-        // Calculate the time differences
-        var now = DateTime.Now;
-        var deadline = Album.Deadline.Value;
-
-        daysLeft = Math.Max(0, Math.Ceiling((deadline - now).TotalDays));
-
-        // Populate DeadlineData
-        DeadlineData = new[] { daysLeft };
-
-        // Set data for selected images
-        SelectedImagesCount = Album.Images.Where(s => s.Selected == true).Count();
-
-        // Converting to double due to bar charts only accept doubles
-        double maxSelectedImages = Album.MaxSelectedImages;
-
-        // Set data for images bar chart
-        SelectedImagesData = new[] {SelectedImagesCount, maxSelectedImages - SelectedImagesCount};
-
-
+        containerName = $"album{Album!.AlbumId}"; // Set the container name based on the AlbumId
     }    
     #endregion
 
     #region Album Info
-
     private async Task UpdateAlbum(EditContext editContext)
     {
-        editContext.Validate(); // Validate the form
+        if (!editContext.Validate()) // Validate the form
+        {
+            Snackbar.Add("Please correct the errors in the form.", Severity.Error);
+            return;
+        }
 
         // using var dbContext = DbFactory.CreateDbContext();
         dbContext.Attach(Album!).State = EntityState.Modified; // Attach the Album to the DbContext and set the state to modified
@@ -300,6 +292,8 @@ else
         try
         {
             await dbContext.SaveChangesAsync(); // Save the changes to the database
+
+            Snackbar.Add("Album updated successfully.", Severity.Success);
         }
         catch (DbUpdateConcurrencyException)
         {
@@ -313,7 +307,7 @@ else
             }
         }
 
-        //StateHasChanged(); // Refresh the UI
+        StateHasChanged(); // Refresh the UI (not enough to hit the db again...)
     }
 
     private bool AlbumExists(int albumId)
@@ -354,12 +348,17 @@ else
     #endregion
 
     #region Upload Images
+    private bool isUploading = false;
+    int totalFiles = 100; // default value
+    int uploadedFiles = 0;
 
     private async Task UploadFiles(IReadOnlyList<IBrowserFile> files)
     {
-        var containerClient = blobService.GetBlobContainerClient(containerName);
+        totalFiles = files.Count; // Set the total files count
+        isUploading = true; // Set the isUploading flag to true
 
-        await containerClient.CreateIfNotExistsAsync(PublicAccessType.Blob);
+        var containerClient = blobService.GetBlobContainerClient(containerName); // Get the BlobContainerClient
+        await containerClient.CreateIfNotExistsAsync(PublicAccessType.Blob); // Create the container if it does not exist
 
         foreach (var file in files)
         {
@@ -379,6 +378,12 @@ else
 
             // Save the image to the database
             Album.Images.Add(new Image { PhotoUrl = fileUri, FileName = fileName });
+
+            // Update the upload progress
+            uploadedFiles++;
+
+            // Refresh the UI
+            StateHasChanged();
         }
 
         // Save the changes to the database
@@ -400,25 +405,31 @@ else
             }
         }
 
+        // Reset the progress indicator variables
+        isUploading = false; // Hide the progress indicator
+        uploadedFiles = 0;
+        totalFiles = 100;
+
         // Refresh the UI
         StateHasChanged();
     }
     #endregion
 
     #region Options and logic for bar charts
-    // Options and logic for Images bar chart
-    public double[] SelectedImagesData;
-    public string[] SelectedImagesLabels = { "Selected Images", "Unselected Images" };
-    public ChartOptions SelectedImagesBarOptions = new ChartOptions() { ChartPalette = new[] { "#1ec8a4", "#ff4181" } };
+    // Options and logic for Images chart
+    public int SelectedImagesCount => Album?.Images.Count(i => i.Selected) ?? 0; // Count the number of selected images
+    public double[] SelectedImagesData => new[] { (double)SelectedImagesCount, (double)(Album?.MaxSelectedImages ?? 0) - SelectedImagesCount }; // Create the data array for the chart
+    public string[] SelectedImagesLabels = { "Selected Images", "Unselected Images" }; // Create the labels array for the chart
+    public ChartOptions SelectedImagesBarOptions = new ChartOptions() { ChartPalette = new[] { "#1ec8a4", "#ff4181" } }; // Create the ChartOptions for the chart
 
-    // Options and logic for Deadline bar chart
-    public double[] DeadlineData;
-    public double daysLeft;
-    public string[] DeadlineLabels
+    // Options and logic for Deadline chart
+    public double DaysLeft => Album?.Deadline.HasValue == true ? Math.Max(0, Math.Ceiling((Album.Deadline.Value - DateTime.Now).TotalDays)) : 1; // Calculate the number of days left until the deadline
+    public double[] DeadlineData => new[] { DaysLeft }; // Create the data array for the chart
+    public string[] DeadlineLabels // Create the labels array for the chart
     {
         get
         {
-            if (daysLeft == 0)
+            if (DaysLeft == 0)
             {
                 return new[] { "Deadline" };
             }
@@ -432,7 +443,7 @@ else
     {
         get
         {
-            if (daysLeft == 0)
+            if (DaysLeft == 0)
             {
                 // Modify the ChartOptions when daysLeft is 0
                 return new ChartOptions()
