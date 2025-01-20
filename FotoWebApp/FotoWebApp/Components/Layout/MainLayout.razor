@@ -16,7 +16,7 @@
                 <MudSpacer />
                 <MudText Class="me-6" Typo="Typo.subtitle1">@context.User.Identity.Name</MudText>
                 <MudAvatar Color="Color.Primary">
-                    @GetInitial(context.User.Identity.Name)
+					@GetInitial(context.User.Identity.Name)
                 </MudAvatar>
             </AuthorizeView>
         </MudAppBar>
@@ -75,9 +75,8 @@
     {
         if (!string.IsNullOrWhiteSpace(userName))
         {
-            
             return userName.Trim()[0].ToString().ToUpper();
-        }
+        } 
         return "X"; 
     }
     #endregion
