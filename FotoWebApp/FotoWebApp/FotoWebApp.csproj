@@ -30,9 +30,4 @@
     </Content>
   </ItemGroup>
 
-
-  <ItemGroup>
-    <None Include="wwwroot\images\GrainWatermark.png" />
-  </ItemGroup>
-
 </Project>
