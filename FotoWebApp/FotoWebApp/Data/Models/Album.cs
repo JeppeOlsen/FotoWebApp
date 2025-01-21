@@ -24,7 +24,7 @@ namespace FotoWebApp.Data.Models
         [StringLength(50, MinimumLength = 1, ErrorMessage = "Project title must be between {2} and {1} characters")]
         public string Name { get; set; }
 
-        [Label("Deadline")]
+        [Label("Customer Deadline")]
         [Required(ErrorMessage = "The deadline is required")]
         public DateTime? Deadline { get; set; }
 

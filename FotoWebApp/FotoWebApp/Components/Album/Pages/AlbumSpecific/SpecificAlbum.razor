@@ -99,10 +99,10 @@ else
                                 <MudNumericField Class="mb-6" Variant="Variant.Text"
                                 @bind-Value="Album.MaxSelectedImages" For="@(() => Album.MaxSelectedImages)" />
                                 @* Deadline *@
-                                <MudDatePicker Label="Deadline" 
+                                <MudDatePicker 
                                 DateFormat="dd.MM.yyyy" ShowWeekNumbers="true"
                                 Editable="true" Placeholder="Select Date"
-                                @bind-Date="Album.Deadline" />
+                                @bind-Date="Album.Deadline" For="@(() => Album.Deadline)" />
                             </MudCardContent>
                             <MudCardActions>
                                 <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="MudBlazor.Color.Primary" Class="ml-auto">Save</MudButton>
