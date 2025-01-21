@@ -31,10 +31,10 @@ namespace FotoWebApp.Data.Models
         [Label("Album Link Password")]
         public string? LinkPassword { get; set; }
 
-        [Label("Maximum photos customer is able to select")]
-        [HelpKeyword("The maximum amount of photos the customer is able to select")]
+        [Label("Amount of selectable photos by the customer")]
+        [HelpKeyword("Amount of selectable photos by the customer")]
         [Range(1, 1000, ErrorMessage = "Amount of photos must be between {1} and {2}")]
-        [Required(ErrorMessage = "The maximum amount of photos the customer is able to select is required")]
+        [Required(ErrorMessage = "Amount of selectable photos by the customer is required")]
         public int MaxSelectedImages { get; set; }
 
 

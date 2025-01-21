@@ -19,9 +19,9 @@
                     @bind-Value="newCustomer.Phone" For="@(() => newCustomer.Phone)" />
                     <MudNumericField Class="mb-6" Variant="Variant.Text"
                     @bind-Value="newAlbum.MaxSelectedImages" For="@(() => newAlbum.MaxSelectedImages)" />
-                    <MudDatePicker
+					<MudDatePicker Label="Customer Deadline"
                     DateFormat="dd.MM.yyyy" ShowWeekNumbers="true"
-                    Editable="true" Placeholder="day.month.year"
+                    Editable="true" Placeholder="Select Date (day.month.year)"
                     @bind-Date="newAlbum.Deadline" />
                 </MudCardContent>
                 <MudCardActions>
