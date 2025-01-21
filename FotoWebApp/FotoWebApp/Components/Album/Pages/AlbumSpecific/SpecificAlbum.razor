@@ -37,7 +37,6 @@
 }
 else
 {
-
     @* Sticky Toolbar? *@
     <MudItem xs="12" Class="pt-0 sticky z-10" Style="top: 64px">
         <MudPaper>
@@ -59,6 +58,10 @@ else
                 <MudButton Variant="Variant.Filled" Color="MudBlazor.Color.Primary" EndIcon="@Icons.Material.Filled.List" OnClick="ShowSelectedImageFileNamesDialogAsync">Selected Images List</MudButton>
                 @* Spacer *@
                 <MudSpacer />
+                <!-- Compression Toggle -->
+                <MudSwitch @bind-Value="isCompressionEnabled" Label="Enable Compression" Color="MudBlazor.Color.Primary" Class="mr-2" />
+                <!-- Watermarking Toggle -->
+                <MudSwitch @bind-Value="isWatermarkingEnabled" Label="Enable Watermarking" Color="MudBlazor.Color.Primary" Class="mr-2" />
                 @* Delete Button *@
                 <MudTooltip Text="Delete Project">
                     <MudIconButton Icon="@Icons.Material.Filled.DeleteForever" OnClick="ShowDeleteConfirmation" Color="MudBlazor.Color.Error" />
@@ -358,6 +361,9 @@ else
     int totalFiles = 100; // default value
     int uploadedFiles = 0;
 
+    private bool isCompressionEnabled = false;
+    private bool isWatermarkingEnabled = false;
+
     private async Task UploadFiles(IReadOnlyList<IBrowserFile> files)
     {
         totalFiles = files.Count; // Set the total files count
@@ -372,27 +378,24 @@ else
 
             // Add watermark to the uploaded image
             using var inputStream = file.OpenReadStream(maxAllowedSize: maxAllowedSize);
-            using var outputStream = new MemoryStream();
+            Stream processedStream;
 
             try
             {
-                // Process the image to add a watermark asynchronously
-                await AddWatermarkAsync(inputStream, outputStream, "wwwroot/images/GrainWatermark.png");
+                // Process the image to add a watermark and/or compress asynchronously
+                processedStream = await ProcessImageAsync(inputStream, isWatermarkingEnabled, isCompressionEnabled, 75, "wwwroot/images/GrainWatermark.png");
             }
             catch (Exception ex)
             {
-                // Handle watermark processing error
-                System.Diagnostics.Debug.WriteLine($"Watermarking failed: {ex.Message}");
+                // Handle processing error
+                System.Diagnostics.Debug.WriteLine($"Processing failed: {ex.Message}");
                 continue; // Skip this file and move on to the next
             }
-
-            // Reset the stream position to the beginning before uploading
-            outputStream.Position = 0;
 
             try
             {
                 // Upload the processed image asynchronously
-                var result = await containerClient.UploadBlobAsync(fileName, outputStream);
+                var result = await containerClient.UploadBlobAsync(fileName, processedStream);
             }
             catch (RequestFailedException ex) when (ex.Status == 409) // Catch the exception when the file already exists
             {
@@ -466,10 +469,17 @@ else
     }
     #endregion
 
-    #region Watermarking
-    
-    private async Task AddWatermarkAsync(Stream inputStream, Stream outputStream, string watermarkPath)
+    /// <summary>
+    /// Adds a watermark to the input image stream.
+    /// </summary>
+    /// <param name="inputStream">The input image stream.</param>
+    /// <param name="watermarkPath">The path to the watermark image.</param>
+    /// <returns>A stream containing the watermarked image.</returns>
+    #region Image Processing Methods
+    private async Task<Stream> AddWatermarkAsync(Stream inputStream, string watermarkPath)
     {
+        var outputStream = new MemoryStream();
+
         // Load the main image asynchronously
         using var image = await SixLabors.ImageSharp.Image.LoadAsync(inputStream);
 
@@ -493,6 +503,59 @@ else
 
         // Save the processed image asynchronously to the output stream
         await image.SaveAsJpegAsync(outputStream);
+        outputStream.Position = 0;
+        return outputStream;
+    }
+    
+    /// <summary>
+    /// Compresses the input image stream to the specified quality.
+    /// </summary>
+    /// <param name="inputStream">The input image stream.</param>
+    /// <param name="quality">The quality of the compressed image (1-100).</param>
+    /// <returns>A stream containing the compressed image.</returns>
+    private async Task<Stream> CompressImageAsync(Stream inputStream, int quality)
+    {
+        var outputStream = new MemoryStream();
+
+        // Load the image asynchronously
+        using var image = await SixLabors.ImageSharp.Image.LoadAsync(inputStream);
+
+        // Set the compression options
+        var encoder = new SixLabors.ImageSharp.Formats.Jpeg.JpegEncoder
+            {
+                Quality = quality // Use the quality from the options panel
+            };
+
+        // Save the compressed image asynchronously to the output stream
+        await image.SaveAsync(outputStream, encoder);
+        outputStream.Position = 0;
+        return outputStream;
+    }
+
+    /// <summary>
+    /// Processes the input image stream by optionally adding a watermark and/or compressing it.
+    /// </summary>
+    /// <param name="inputStream">The input image stream.</param>
+    /// <param name="applyWatermark">Whether to apply a watermark to the image.</param>
+    /// <param name="applyCompression">Whether to compress the image.</param>
+    /// <param name="compressionQuality">The quality of the compressed image (1-100).</param>
+    /// <param name="watermarkPath">The path to the watermark image.</param>
+    /// <returns>A stream containing the processed image.</returns>
+    private async Task<Stream> ProcessImageAsync(Stream inputStream, bool applyWatermark, bool applyCompression, int compressionQuality, string watermarkPath)
+    {
+        Stream processedStream = inputStream;
+
+        if (applyWatermark)
+        {
+            processedStream = await AddWatermarkAsync(processedStream, watermarkPath);
+        }
+
+        if (applyCompression)
+        {
+            processedStream = await CompressImageAsync(processedStream, compressionQuality);
+        }
+
+        return processedStream;
     }
     #endregion
 
