@@ -349,9 +349,26 @@ else
     {
         if (Album != null)
         {
+            // Get the container client
+            var containerClient = blobService.GetBlobContainerClient(containerName); // containerName is set in the OnInitializedAsync method
+
+            try
+            {
+                // Delete the container
+                await containerClient.DeleteIfExistsAsync();
+            }
+            catch (Exception ex)
+            {
+                Snackbar.Add($"An error occurred while deleting the project: {ex.Message}", Severity.Error);
+                return;
+            }
+
+            // Remove the album from the database
             dbContext.Albums.Remove(Album);
             await dbContext.SaveChangesAsync();
-            NavigationManager.NavigateTo("/albums"); // Redirect after deletion
+
+            // Navigate to the albums page after deletion
+            NavigationManager.NavigateTo("/albums");
         }
     }
     #endregion
