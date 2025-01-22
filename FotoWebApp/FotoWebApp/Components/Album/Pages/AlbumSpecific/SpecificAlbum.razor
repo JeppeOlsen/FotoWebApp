@@ -42,7 +42,7 @@ else
         <MudPaper>
             <MudToolBar Class="justify-end">
                 @* Upload Button *@
-                <MudFileUpload T="IReadOnlyList<IBrowserFile>" FilesChanged="UploadFiles" MaximumFileCount="100" AppendMultipleFiles="true" Accept=".png, .jpg, .gif, .tiff, .tif, .heif, .heic, .bmp">
+                <MudFileUpload T="IReadOnlyList<IBrowserFile>" FilesChanged="UploadFiles" MaximumFileCount="100" AppendMultipleFiles="false" Accept=".png, .jpg, .gif, .tiff, .tif, .heif, .heic, .bmp">
                     <ActivatorContent>
                         <MudButton Variant="Variant.Filled"
                         Color="MudBlazor.Color.Primary"
