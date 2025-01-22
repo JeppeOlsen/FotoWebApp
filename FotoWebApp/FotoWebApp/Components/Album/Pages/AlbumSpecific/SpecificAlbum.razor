@@ -148,8 +148,8 @@ else
         @* Upload Progress Area (hidden when not uploading) *@
         <MudItem xs="12">
             @if (isUploading) {
-                <MudProgressLinear Color="MudBlazor.Color.Success" Size="MudBlazor.Size.Large" Rounded="true" Striped="true" Value="@uploadedFiles" Class="my-6">
-                    <MudText Typo="Typo.subtitle1">
+                <MudProgressLinear Color="MudBlazor.Color.Success" Size="MudBlazor.Size.Large" Rounded="true" Striped="true" Value="@uploadedFiles" Max="@totalFiles">
+                    <MudText Color="MudBlazor.Color.Dark">
                         <b>@uploadedFiles of @totalFiles</b>
                     </MudText>
                 </MudProgressLinear>
