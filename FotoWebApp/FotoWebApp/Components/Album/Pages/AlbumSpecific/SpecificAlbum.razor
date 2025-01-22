@@ -259,7 +259,7 @@ else
     public Album? Album { get; set; }
 
     private string containerName; // Declare without initializing
-    private const int maxAllowedSize = 10 * 1024 * 1024; // 10 MB. TODO: Get from settings
+    private const int maxAllowedSize = 20 * 1024 * 1024; // 10 MB. TODO: Get from settings
     private const string baseUri = "https://stfotowebappeu001.blob.core.windows.net"; // TODO: Get from settings
 
     #region OnInitialized
@@ -383,7 +383,7 @@ else
             try
             {
                 // Process the image to add a watermark and/or compress asynchronously
-                processedStream = await ProcessImageAsync(inputStream, isWatermarkingEnabled, isCompressionEnabled, 75, "wwwroot/images/GrainWatermark.png");
+                processedStream = await ProcessImageAsync(inputStream, isWatermarkingEnabled, isCompressionEnabled, 30, "wwwroot/images/GrainWatermark.png");
             }
             catch (Exception ex)
             {
