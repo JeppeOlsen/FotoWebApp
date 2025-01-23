@@ -206,7 +206,7 @@
         }
     }
 
-    private void ShowSnacbarSaveChanges()
+    private async void ShowSnacbarSaveChanges()
     {
         Snackbar.Configuration.PositionClass = Defaults.Classes.Position.BottomEnd;
         Snackbar.Add("You have made changes please save", Severity.Info, config =>
@@ -215,18 +215,17 @@
             config.ShowCloseIcon = false;
             config.RequireInteraction = true;
             config.ActionColor = Color.Transparent;
-            config.Onclick = snackbar =>
+            config.Onclick = async snackbar =>
             {
                 if (numberOfSelectedImages > Album?.MaxSelectedImages)
                 {
                     ShowSnackbarError();
-                    return Task.CompletedTask;
+                    return;
                 }
 
-
-                UpdateImg();
+                await UpdateImg();
                 ShowSnacbarSucces();
-                return Task.CompletedTask;
+                
             };
         });
     }
