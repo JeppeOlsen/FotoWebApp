@@ -168,13 +168,20 @@
         {
             SelectedImages.Add(imageId);
             numberOfSelectedImages++;
-            
+
         }
         else
         {
             SelectedImages.Remove(imageId);
             numberOfSelectedImages--;
-            
+
+        }
+
+        if (numberOfSelectedImages > Album?.MaxSelectedImages)
+        {
+            ShowSnackbarWarning();
+            ShowSnacbarSaveChanges();
+            return;
         }
 
         ShowSnacbarSaveChanges();
@@ -213,6 +220,13 @@
             config.ActionColor = Color.Transparent;
             config.Onclick = snackbar =>
             {
+                if (numberOfSelectedImages > Album?.MaxSelectedImages)
+                {
+                    ShowSnackbarError();
+                    return Task.CompletedTask;
+                }
+
+
                 UpdateImg();
                 ShowSnacbarSucces();
                 return Task.CompletedTask;
@@ -223,6 +237,21 @@
     private void ShowSnacbarSucces()
     {
         Snackbar.Add("Saved", Severity.Success);
+    }
+
+    private void ShowSnackbarError()
+    {
+        Snackbar.Add($"Cant save your changes because you have choosen more than {Album?.MaxSelectedImages} please remove some", Severity.Error);
+    }
+
+    private void ShowSnackbarWarning()
+    {
+        Snackbar.Add($"You cant choose more than {Album?.MaxSelectedImages} Images please remove some", Severity.Warning, config =>
+        {
+            config.ShowCloseIcon = true;
+            config.RequireInteraction = false;
+        });
+
     }
 
     #region Enlarge Photo logic
