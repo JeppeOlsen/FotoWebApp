@@ -62,7 +62,7 @@ else
             <MudItem Style="min-width: 255px">
                 <MudLink Href="@($"albums/{album.AlbumId}")" Underline="Underline.None">
                     <MudCard>
-                        <MudCardMedia Image="https://picsum.photos/500" Height="200" Style="border-radius: 4px" />
+                        <MudCardMedia Image="@(album.Images.Any() ? album.Images.First().PhotoUrl : "/images/placeholders/pink.jpg" )" Height="200" Style="border-radius: 4px" />
                         <MudCardContent>
                             <MudText Typo="Typo.h5">@album.Name</MudText>
                             <MudText Typo="Typo.body2">@album.Customer.Name</MudText>
@@ -88,6 +88,7 @@ else
     {
         // await Task.Delay(500); // Only for demo view
         await GetAlbums();
+       
     }
 
     private async Task GetAlbums()
@@ -104,6 +105,7 @@ else
                     photographerId = photographer.PhotographerId; // Set the photographer id
                     albums = await MyDbContext.Albums
                         .Include(album => album.Customer)
+                        .Include(album => album.Images)
                         .Where(album => album.PhotographerId == photographer.PhotographerId)
                         .ToListAsync();
                 }
@@ -144,5 +146,8 @@ else
         }
 
     }
+
+
+
 
 }
