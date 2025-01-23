@@ -45,9 +45,9 @@
     <MudItem xs="12" Class="pt-0 sticky z-10" Style="top: 64px">
         <MudPaper>
             <MudToolBar>
-                <MudText>Deadline: @Album?.Deadline?.ToString("dd-MM-yyyy")</MudText>
-                <MudSpacer />
                 <MudText>Time left to pick: @daysleft days</MudText>
+                <MudSpacer />
+                <MudText>Deadline: @Album?.Deadline?.ToString("dd-MM-yyyy")</MudText>
                 <MudSpacer />
                 <MudText>Images choosen: @numberOfSelectedImages / @Album?.MaxSelectedImages</MudText>
             </MudToolBar>
