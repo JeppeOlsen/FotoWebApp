@@ -175,8 +175,8 @@ else
                             <MudTabPanel Text="Uploaded images">
                                 <MudTable Items="@Album.Images" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading" LoadingProgressColor="MudBlazor.Color.Info">
                                     <HeaderContent>
-                                        <MudTh>Image</MudTh>
-                                        <MudTh>Filename</MudTh>
+                                        <MudTh>Images (@Album.Images.Count())</MudTh>
+                                        <MudTh>Filenames</MudTh>
                                     </HeaderContent>
                                     <RowTemplate>
                                         <MudTd DataLabel="Image"><MudImage Style="cursor: zoom-in" @onclick="() => OpenImageDialogAsync(context.PhotoUrl, context.FileName)" ObjectFit="ObjectFit.Cover" Src="@context.PhotoUrl" Elevation="25" Class="rounded-lg" Width="50" Height="50" /></MudTd>
@@ -188,8 +188,8 @@ else
                             <MudTabPanel Text="Selected Images">
                                 <MudTable Items="@Album.Images" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading" LoadingProgressColor="MudBlazor.Color.Info">
                                     <HeaderContent>
-                                        <MudTh>Image</MudTh>
-                                        <MudTh>Filename</MudTh>
+                                        <MudTh>Images (@SelectedImagesCount)</MudTh>
+                                        <MudTh>Filenames</MudTh>
                                     </HeaderContent>
                                     <RowTemplate>
                                         @if(context.Selected)
