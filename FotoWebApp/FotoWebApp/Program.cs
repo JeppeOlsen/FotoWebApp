@@ -6,12 +6,16 @@ using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Azure;
+using MudBlazor;
 using MudBlazor.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add MudBlazor services
-builder.Services.AddMudServices();
+builder.Services.AddMudServices(configuration =>
+{
+    configuration.SnackbarConfiguration.PositionClass = Defaults.Classes.Position.BottomRight; // Set default position for all snackbars
+});
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
