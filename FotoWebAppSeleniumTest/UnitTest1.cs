@@ -8,6 +8,10 @@ namespace FotoWebAppSeleniumTest
     {
         IWebDriver driver;
 
+
+        public string username = "christian@christian.dk";
+        public string pass = "Test123!";
+
         // Reuseable function to login to the page
         private void LoginUser()
         {
@@ -16,9 +20,6 @@ namespace FotoWebAppSeleniumTest
             driver.FindElement(By.XPath("/html/body/div[1]/div/div/div/div/form/div/div[2]/div/div/div/input")).SendKeys(pass);
             driver.FindElement(By.XPath("/html/body/div[1]/div/div/div/div/form/div/div[4]/button")).Click();
         }
-
-        public string username = "christian@christian.dk";
-        public string pass = "Test123!";
 
         [SetUp]
         public void Setup()
@@ -31,10 +32,7 @@ namespace FotoWebAppSeleniumTest
         [Test, Order(1)]
         public void LoginUserTest() 
         {
-            driver.Navigate().GoToUrl("https://localhost:7120/Account/Login?ReturnUrl=%2F");
-            driver.FindElement(By.XPath("/html/body/div[1]/div/div/div/div/form/div/div[1]/div/div/div/input")).SendKeys(username);
-            driver.FindElement(By.XPath("/html/body/div[1]/div/div/div/div/form/div/div[2]/div/div/div/input")).SendKeys(pass);
-            driver.FindElement(By.XPath("/html/body/div[1]/div/div/div/div/form/div/div[4]/button")).Click();
+            LoginUser();
 
             // Check to see if user i navigated to dashboard
             Assert.That(driver.Url, Is.EqualTo("https://localhost:7120/"));
@@ -79,7 +77,6 @@ namespace FotoWebAppSeleniumTest
             var albumExists = albumList.FindElements(By.XPath(".//h5[contains(text(), 'TestTitle')]")).Any();
 
             Assert.IsTrue(albumExists);
-
 
         }
 
