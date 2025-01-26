@@ -378,8 +378,8 @@ else
     int totalFiles = 100; // default value
     int uploadedFiles = 0;
 
-    private bool isCompressionEnabled = false;
-    private bool isWatermarkingEnabled = false;
+    private bool isCompressionEnabled = true;
+    private bool isWatermarkingEnabled = true;
 
     private async Task UploadFiles(IReadOnlyList<IBrowserFile> files)
     {
